@@ -1,4 +1,4 @@
-![udpx Logo](/assets/udpix-logo.png)
+![udpx Logo](/examples/udpix-logo.png)
 
 **udpx is a compression technology to transport data.**
 
