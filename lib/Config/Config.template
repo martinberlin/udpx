@@ -1,0 +1,21 @@
+// Configuration
+#define DEBUG_MODE true
+
+#define WIFI_SSID "KabelBox-A210"
+#define WIFI_PASS ""
+
+// UDP Listener on port
+#define UDP_PORT 1234
+
+// Set a JSON valid and existing data/presentation-name.json
+#define FIRMWARE_PRESENTATION "/stripe-grb-144.json"
+
+// MQTT Config
+#define MQTT_ENABLE true
+#define MQTT_HOST IPAddress(192, 168, 0, 11)
+#define MQTT_PORT 1883
+
+// Topics
+#define PRESENTATION_TOPIC "presentation/"
+#define IN_TOPIC           "pixel-in/"
+#define OUT_TOPIC          "pixel-out/"
