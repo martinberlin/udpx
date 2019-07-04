@@ -2,4 +2,4 @@
 NeoPixelBus=2.5.0
 async-mqtt-client=0.8.1
 ArduinoJson=6.9.1
-brotli=master
+martinberlin/brotli=1.0.7
