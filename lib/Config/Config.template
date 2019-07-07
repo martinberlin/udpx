@@ -8,7 +8,7 @@
 #define UDP_PORT 1234
 
 // Set a JSON valid and existing data/presentation-name.json
-#define FIRMWARE_PRESENTATION "/stripe-grb-144.json"
+#define FIRMWARE_PRESENTATION "/presentation.json"
 
 // MQTT Config
 #define MQTT_ENABLE true
@@ -17,5 +17,5 @@
 
 // Topics
 #define PRESENTATION_TOPIC "presentation/"
-#define IN_TOPIC           "pixel-in/"
-#define OUT_TOPIC          "pixel-out/"
+#define IN_TOPIC           "pixelcrasher/pixel-in/"
+#define OUT_TOPIC          "pixelcrasher/pixel-out/"

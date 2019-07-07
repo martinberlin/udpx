@@ -262,7 +262,7 @@ void onMqttConnect(bool sessionPresent) {
   
   // Subscribe to receive topic (TODO: Later this should be dynamic)
   printMessage("Subscribing to IN_TOPIC, packetId: ", false);
-  uint16_t packetIdSub = mqttClient.subscribe("pixel-in/4ae5b9/hsl", 0);
+  uint16_t packetIdSub = mqttClient.subscribe("pixelcrasher/pixel-in", 0);
   printMessage(String(packetIdSub));
 }
 
@@ -290,7 +290,7 @@ void onMqttUnsubscribe(uint16_t packetId) {
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, unsigned int len, size_t index, size_t total) {
 // TODO: This topic should be dynamic 
-   if (0 == strcmp(topic, "pixel-in/4ae5b9/hsl"))
+   if (0 == strcmp(topic, "pixelcrasher/pixel-in/4ae5b9/hsl"))
   {
     // Enable buffering of partial messages. TODO: Do this with char not with String!
     if (index==0) {               // at start
@@ -330,7 +330,7 @@ void setup()
   mqttClient.setKeepAlive(5);
   mqttClient.setMaxTopicLength(2000);
   // TODO: Update this with bssid     v
-  mqttClient.setWill("pixel-out/4ae5b9/online", 0, false, "false");
+  mqttClient.setWill("pixelcrasher/pixel-out/4ae5b9/online", 0, false, "false");
 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
