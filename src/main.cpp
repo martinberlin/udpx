@@ -262,7 +262,7 @@ void onMqttConnect(bool sessionPresent) {
   
   // Subscribe to receive topic (TODO: Later this should be dynamic)
   printMessage("Subscribing to IN_TOPIC, packetId: ", false);
-  uint16_t packetIdSub = mqttClient.subscribe("pixelcrasher/pixel-in", 0);
+  uint16_t packetIdSub = mqttClient.subscribe(IN_TOPIC, 0);
   printMessage(String(packetIdSub));
 }
 

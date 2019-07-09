@@ -1,4 +1,5 @@
-{
+ 
+ {
     "title":"Led stripe Controller 1",
     "hardwareId":"<chipid>",
     "type":"udpx-stripe",

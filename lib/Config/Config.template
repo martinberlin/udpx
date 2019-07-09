@@ -16,6 +16,6 @@
 #define MQTT_PORT 1883
 
 // Topics
-#define PRESENTATION_TOPIC "presentation/"
-#define IN_TOPIC           "pixelcrasher/pixel-in/"
-#define OUT_TOPIC          "pixelcrasher/pixel-out/"
+#define PRESENTATION_TOPIC "pixelcrasher/presentation"
+#define IN_TOPIC           "pixelcrasher/pixel-in"
+#define OUT_TOPIC          "pixelcrasher/pixel-out"
