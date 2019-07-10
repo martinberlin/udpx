@@ -70,7 +70,7 @@ void connectToMqtt() {
   mqttClient.connect();
 }
 /**
- * Convert the IP to string 
+ * Convert the IP to string
  */
 String IpAddress2String(const IPAddress& ipAddress)
 {
@@ -89,7 +89,7 @@ String IpAddress2String(const IPAddress& ipAddress)
  TODO: Research how to pass an array in notused Parameter (compressed data)
  */
 // Task sent to the core to decompress + push to Output
-void brTask(void * notused){  
+void brTask(void * notused){
     uint8_t * brOutBuffer = (uint8_t*)malloc(BROTLI_DECOMPRESSION_BUFFER);
     if (debugMode) Serial.println(" Heap: "+String(ESP.getFreeHeap()));
     size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
@@ -105,10 +105,10 @@ void brTask(void * notused){
         // Deserialize the uncompressed JSON (strip error handling)
         deserializeJson(doc, brOutBuffer);
         JsonArray pixels = doc.as<JsonArray>();
-        output.setPixels(&pixels);     
+        output.setPixels(&pixels);
         free(brOutBuffer); // Causing corrupted heap?
       }
-      
+
       vTaskDelete(NULL);
       // https://www.freertos.org/implementing-a-FreeRTOS-task.html
       // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
@@ -147,7 +147,7 @@ void WiFiEvent(WiFiEvent_t event) {
               printMessage(error.c_str());
               return;
             }
-            
+
             // TODO: Check if this properties exist in JSON otherwise die here with a proper message
             strcpy(internalConfig.title, doc["title"]);
             internalConfig.compression = doc["compression"];
@@ -170,8 +170,8 @@ void WiFiEvent(WiFiEvent_t event) {
       {
         printMessage("SPIFFs cannot start. FFS Formatted?");
       }
-    
-        connectToMqtt(); 
+
+        connectToMqtt();
       } else {
         Serial.println("MQTT_ENABLE is disabled per Config. Spiffs presentation read skipped");
       }
@@ -190,12 +190,12 @@ void WiFiEvent(WiFiEvent_t event) {
         if (debugMode) {
           Serial.write(packet.data(), packet.length());
         } */
-        
+
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
         compressed  = (uint8_t*)malloc(receivedLength);
-        
+
         for ( int i = 0; i < packet.length(); i++ ) {
             uint8_t conv = (int) packet.data()[i];
             compressed[i] = conv;
@@ -213,7 +213,7 @@ void WiFiEvent(WiFiEvent_t event) {
         //reply to the client (We don't need to ACK now)
         //packet.printf("1");
         delay(10);
-        }); 
+        });
     } else {
       Serial.println("UDP Lister could not be started");
     }
@@ -256,14 +256,19 @@ void WiFiEvent(WiFiEvent_t event) {
 void onMqttConnect(bool sessionPresent) {
   printMessage("Connected to MQTT. Sending presentation to topic: ", false);
   printMessage(PRESENTATION_TOPIC);
-  
+
   // TODO: Read presentation from JSON and publish to PRESENTATION_TOPIC
   mqttClient.publish(PRESENTATION_TOPIC, 1, true, presentation.c_str());
-  
+
   // Subscribe to receive topic (TODO: Later this should be dynamic)
   printMessage("Subscribing to IN_TOPIC, packetId: ", false);
-  uint16_t packetIdSub = mqttClient.subscribe(IN_TOPIC, 0);
+  uint16_t packetIdSub = mqttClient.subscribe(IN_TOPIC + "/" + bssid, 0);
   printMessage(String(packetIdSub));
+
+  char onlineStatusTopic[64];
+    snprintf(onlineStatusTopic, sizeof onlineStatusTopic, "%s%s%s%s", OUT_TOPIC,"/", bssid, "/online-status");
+
+  mqttClient.publish(onlineStatusTopic, 1, true, "online");
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
@@ -289,7 +294,7 @@ void onMqttUnsubscribe(uint16_t packetId) {
 }
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, unsigned int len, size_t index, size_t total) {
-// TODO: This topic should be dynamic 
+// TODO: This topic should be dynamic
    if (0 == strcmp(topic, "pixelcrasher/pixel-in/4ae5b9/hsl"))
   {
     // Enable buffering of partial messages. TODO: Do this with char not with String!
@@ -299,7 +304,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     payloadBuffer += payload;
     if (! (index + len == total)) { // at end
       return;
-    }  
+    }
   }
 }
 
@@ -315,22 +320,24 @@ void setup()
   // Set chip id in hex format
   itoa(ESP.getEfuseMac(), bssid, 16);
   strcpy(internalConfig.title, bssid);
-  
+
   // Set up automatic reconnect timers
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
   connectToWifi();
 
   WiFi.onEvent(WiFiEvent);
-  
-  char lastWill[64];
-  snprintf(lastWill, sizeof lastWill, "%s%s%s", OUT_TOPIC, bssid, "/online");
-  printMessage(lastWill);
   // keepalive period, broker sets device offline after this period
   mqttClient.setKeepAlive(5);
   mqttClient.setMaxTopicLength(2000);
-  // TODO: Update this with bssid     v
-  mqttClient.setWill("pixelcrasher/pixel-out/4ae5b9/online", 0, false, "false");
+
+  // set last will and testament
+  // https://www.hivemq.com/blog/mqtt-essentials-part-9-last-will-and-testament/
+  // https://github.com/marvinroger/async-mqtt-client/blob/master/docs/2.-API-reference.md#asyncmqttclient-setwillconst-char-topic-uint8_t-qos-bool-retain-const-char-payload--nullptr-size_t-length--0
+  char lastWill[64];
+  snprintf(lastWill, sizeof lastWill, "%s%s%s%s", OUT_TOPIC,"/", bssid, "/online-status");
+  printMessage(lastWill);
+  mqttClient.setWill(lastWill, 1, true, "offline");
 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);

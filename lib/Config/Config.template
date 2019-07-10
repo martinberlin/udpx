@@ -17,5 +17,5 @@
 
 // Topics
 #define PRESENTATION_TOPIC "pixelcrasher/presentation"
-#define IN_TOPIC           "pixelcrasher/pixel-in"
-#define OUT_TOPIC          "pixelcrasher/pixel-out"
+#define IN_TOPIC           "pixelcrasher/controller"
+#define OUT_TOPIC          "pixelcrasher/controller"
