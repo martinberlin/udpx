@@ -1,18 +1,12 @@
- 
  {
-    "title":"Led stripe Controller 1",
-    "hardwareId":"<chipid>",
-    "type":"udpx-stripe",
-    "firmwareVersion":"0.1",
-    "description":"1-channel grb led stripe controller",
-    "features":{
-       "rgba":[
-          {
-             "name":"Channel 1",
-             "length": 144
-          }
-       ]
-    },
-    "compression":true,
-    "udp_ip":"<udp_ip>"
+   "title":"Led stripe Controller",
+   "hardwareId": "<esp_chip_id>",
+   "ip": "<udp_ip>",
+   "description":"1-channel grb led stripe controller",
+   "channels": [
+     {
+       "name": "<name of channel>",
+       "type": "<rgb or rgbw>",
+       "maxLength": 144 }
+   ]
  }

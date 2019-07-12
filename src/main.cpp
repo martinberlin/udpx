@@ -132,7 +132,7 @@ void WiFiEvent(WiFiEvent_t event) {
 
           File configFile = SPIFFS.open(FIRMWARE_PRESENTATION, FILE_READ);
           presentation = configFile.readString();
-          presentation.replace("<chipid>", bssid);
+          presentation.replace("<esp_chip_id>", bssid);
           presentation.replace("<udp_ip>", IpAddress2String(WiFi.localIP()));
           if (configFile)
           {
@@ -262,7 +262,10 @@ void onMqttConnect(bool sessionPresent) {
 
   // Subscribe to receive topic (TODO: Later this should be dynamic)
   printMessage("Subscribing to IN_TOPIC, packetId: ", false);
-  uint16_t packetIdSub = mqttClient.subscribe(IN_TOPIC + "/" + bssid, 0);
+  String inTopic =  String(IN_TOPIC) + "/" + String(bssid);
+  printMessage("IN_TOPIC: "+inTopic);
+
+  uint16_t packetIdSub = mqttClient.subscribe(inTopic.c_str(), 0);
   printMessage(String(packetIdSub));
 
   char onlineStatusTopic[64];
