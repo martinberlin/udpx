@@ -340,7 +340,8 @@ void setup()
   char lastWill[64];
   snprintf(lastWill, sizeof lastWill, "%s%s%s%s", OUT_TOPIC,"/", bssid, "/online-status");
   printMessage(lastWill);
-  mqttClient.setWill(lastWill, 1, true, "offline");
+  // TODO: Hendrik this is NOT working here: Making a connect / disconnect all the time, please check it!
+  //mqttClient.setWill(lastWill, 1, true, "offline");
 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);

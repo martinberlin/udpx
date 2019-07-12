@@ -7,6 +7,7 @@
      {
        "name": "<name of channel>",
        "type": "<rgb or rgbw>",
-       "maxLength": 144 }
+       "maxLength": 144 
+      }
    ]
  }
