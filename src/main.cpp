@@ -15,6 +15,7 @@ extern "C" {
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
+String lastWill;
 // Note DynamicJsonDocument should be created once otherwise eats your HEAP memory like cookies
 const size_t capacity = 144 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(144);
 DynamicJsonDocument doc(capacity);
@@ -256,7 +257,9 @@ void WiFiEvent(WiFiEvent_t event) {
 void onMqttConnect(bool sessionPresent) {
   printMessage("Connected to MQTT. Sending presentation to topic: ", false);
   printMessage(PRESENTATION_TOPIC);
-  
+  printMessage("Last will: ", false);
+  printMessage(lastWill);
+  mqttClient.setWill(lastWill.c_str(), 0, false, "offline");
   // TODO: Read presentation from JSON and publish to PRESENTATION_TOPIC
   mqttClient.publish(PRESENTATION_TOPIC, 1, true, presentation.c_str());
   
@@ -323,15 +326,12 @@ void setup()
 
   WiFi.onEvent(WiFiEvent);
   
-  char lastWill[64];
-  snprintf(lastWill, sizeof lastWill, "%s%s%s", OUT_TOPIC, bssid, "/online");
-  printMessage(lastWill);
-  // keepalive period, broker sets device offline after this period
-  mqttClient.setKeepAlive(5);
-  mqttClient.setMaxTopicLength(2000);
-  // TODO: Update this with bssid     v
-  mqttClient.setWill("pixelcrasher/pixel-out/4ae5b9/online", 0, false, "false");
+  lastWill = "pixelcrasher/status/"+String(bssid);
 
+  // keepalive period, broker sets device offline after this period
+  mqttClient.setKeepAlive(15);
+  mqttClient.setMaxTopicLength(2000);
+ 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
   mqttClient.onSubscribe(onMqttSubscribe);
