@@ -259,7 +259,7 @@ void onMqttConnect(bool sessionPresent) {
   printMessage(PRESENTATION_TOPIC);
   printMessage("Last will: ", false);
   printMessage(lastWill);
-  mqttClient.setWill(lastWill.c_str(), 0, false, "offline");
+  mqttClient.setWill(lastWill.c_str(), 1, true, "false");
   // TODO: Read presentation from JSON and publish to PRESENTATION_TOPIC
   mqttClient.publish(PRESENTATION_TOPIC, 1, true, presentation.c_str());
   
@@ -325,8 +325,8 @@ void setup()
   connectToWifi();
 
   WiFi.onEvent(WiFiEvent);
-  
-  lastWill = "pixelcrasher/status/"+String(bssid);
+  // TODO: Update this with new define STATUS_TOPIC
+  lastWill = "pixelcrasher/online-status/"+String(bssid);
 
   // keepalive period, broker sets device offline after this period
   mqttClient.setKeepAlive(15);

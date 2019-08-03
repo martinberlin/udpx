@@ -19,3 +19,4 @@
 #define PRESENTATION_TOPIC "pixelcrasher/presentation"
 #define IN_TOPIC           "pixelcrasher/pixel-in"
 #define OUT_TOPIC          "pixelcrasher/pixel-out"
+#define STATUS_TOPIC       "pixelcrasher/online-status"
