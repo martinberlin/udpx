@@ -259,7 +259,7 @@ void onMqttConnect(bool sessionPresent) {
   printMessage(PRESENTATION_TOPIC);
   printMessage("Last will: ", false);
   printMessage(lastWill);
-  mqttClient.setWill(lastWill.c_str(), 1, true, "false");
+  mqttClient.publish(lastWill.c_str(), 1, true, "true");
   // TODO: Read presentation from JSON and publish to PRESENTATION_TOPIC
   mqttClient.publish(PRESENTATION_TOPIC, 1, true, presentation.c_str());
   
@@ -331,7 +331,7 @@ void setup()
   // keepalive period, broker sets device offline after this period
   mqttClient.setKeepAlive(15);
   mqttClient.setMaxTopicLength(2000);
- 
+  mqttClient.setWill(lastWill.c_str(), 1, true, "false");
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
   mqttClient.onSubscribe(onMqttSubscribe);
