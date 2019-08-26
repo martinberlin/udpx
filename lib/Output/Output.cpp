@@ -3,7 +3,7 @@
 #endif
 #include "Output.h"
 
-#define PIXELCOUNT 72
+#define PIXELCOUNT 144
 #define PIXELPIN 19
 #ifdef ESP32
   NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXELCOUNT, PIXELPIN);
@@ -30,8 +30,5 @@ void Output::setPixels(JsonArray *pixels) {
          strip.SetPixelColor(i, RgbColor(pixel[0],pixel[1],pixel[2]));
          i++;
     }
-}
-
-void Output::loop() {
-   strip.Show();
+    strip.Show();
 }

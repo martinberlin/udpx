@@ -10,7 +10,6 @@ class Output
   public:
   Output();
   void setup();
-  void loop();
   void setPixels(JsonArray*);
   private:
   

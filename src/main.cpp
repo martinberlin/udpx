@@ -344,5 +344,5 @@ void setup()
 }
 
 void loop() {
-  output.loop();
+  delay(0);
 }

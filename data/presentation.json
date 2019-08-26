@@ -4,7 +4,7 @@
 	"hardwareId": "<chipid>",
 	"channels": [{
 		"name": "Channel 1",
-		"type": "rgb"
+		"type": "rgbw"
 	}],
 	"ip": "<udp_ip>"
 }
