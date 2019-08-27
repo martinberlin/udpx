@@ -91,7 +91,7 @@ String IpAddress2String(const IPAddress& ipAddress)
  */
 // Task sent to the core to decompress + push to Output
 void brTask(void * notused){  
-    uint8_t * brOutBuffer = (uint8_t*)malloc(BROTLI_DECOMPRESSION_BUFFER);
+    uint8_t *brOutBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
     if (debugMode) Serial.println(" Heap: "+String(ESP.getFreeHeap()));
     size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
 
@@ -100,14 +100,15 @@ void brTask(void * notused){
       (const uint8_t *)compressed,
       &bufferLength,
       brOutBuffer);
-      free(compressed);
+      delete compressed;
 
       if (brotli == 1) {
         // Deserialize the uncompressed JSON (strip error handling)
         deserializeJson(doc, brOutBuffer);
         JsonArray pixels = doc.as<JsonArray>();
-        output.setPixels(&pixels);     
-        free(brOutBuffer); // Causing corrupted heap?
+        output.setPixels(&pixels);
+	delete brOutBuffer;
+        //free(brOutBuffer); // Causing corrupted heap?
       }
       
       vTaskDelete(NULL);
@@ -195,7 +196,7 @@ void WiFiEvent(WiFiEvent_t event) {
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
-        compressed  = (uint8_t*)malloc(receivedLength);
+        compressed  = new uint8_t[receivedLength];
         
         for ( int i = 0; i < packet.length(); i++ ) {
             uint8_t conv = (int) packet.data()[i];
