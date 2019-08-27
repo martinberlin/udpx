@@ -30,7 +30,7 @@ AsyncUDP udp;
 
 // Brotli decompression buffer
 #define BROTLI_DECOMPRESSION_BUFFER 3000
-uint8_t * compressed;
+//uint8_t * compressed;
 TaskHandle_t brotliTask;
 size_t receivedLength;
 BrotliDecoderResult brotli;
@@ -90,7 +90,7 @@ String IpAddress2String(const IPAddress& ipAddress)
  TODO: Research how to pass an array in notused Parameter (compressed data)
  */
 // Task sent to the core to decompress + push to Output
-void brTask(void * notused){  
+void brTask(void * compressed){  
     uint8_t *brOutBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
     if (debugMode) Serial.println(" Heap: "+String(ESP.getFreeHeap()));
     size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
@@ -196,7 +196,7 @@ void WiFiEvent(WiFiEvent_t event) {
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
-        compressed  = new uint8_t[receivedLength];
+        uint8_t *compressed  = new uint8_t[receivedLength];
         
         for ( int i = 0; i < packet.length(); i++ ) {
             uint8_t conv = (int) packet.data()[i];
@@ -208,7 +208,7 @@ void WiFiEvent(WiFiEvent_t event) {
                     brTask,        /* Task function. */
                     "uncompress",  /* name of task. */
                     20000,         /* Stack size of task */
-                    NULL,          /* parameter of the task */
+                    compressed,          /* parameter of the task */
                     9,             /* priority of the task */
                     &brotliTask,   /* Task handle to keep track of created task */
                     0);            /* pin task to core 1 */
