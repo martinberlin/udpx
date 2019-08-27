@@ -1,9 +1,16 @@
-var div1 = $("div#div1"),
-    div2 = $("div#div2"),
+var stripe = $("div#stripe"),
     btn1 = $("button#btn1"),
     btn2 = $("button#btn2"),
-    
-    tl1 = TweenMax.to(div1, 2, {left:300, onUpdate:lineUpdate, onUpdateParams:["{self}"], paused:true});
+    red = $("#r"), green = $("#g"), blue = $("#b"),
+    delay = $("#duration");
+
+    tl1 = TweenMax.to(stripe, delay.val(), {
+      left:300,
+      onUpdate:lineUpdate,
+      onUpdateParams:["{self}"],
+      paused:true
+     });
+
 
 function lineUpdate(tween)
 {
@@ -12,9 +19,12 @@ function lineUpdate(tween)
 
 btn1.click(function()
 {
+  stripe.css("background-color", "rgb(" + red.val() + "," + green.val() + "," + blue.val() +")");
+  tl1.duration(delay.val());
   tl1.play(0);
 });
 btn2.click(function()
 {
+  tl1.duration(delay.val());
   tl1.reverse();
 });

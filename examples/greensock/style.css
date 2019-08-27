@@ -1,7 +1,12 @@
-#div1, #div2{
+#box {
+   border: 1px solid black;
+   width: 400px;height: 100px;
+   margin-top: 5px;
+}
+
+#stripe {
   width:100px;
   height:100px;
   position:relative;
   background:#FF0000;
-  margin-top:5px;
 }
