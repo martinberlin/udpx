@@ -69,10 +69,10 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, unsigned *pixCnt){
         *pixCnt = 0;
         return NULL;
     }
-    if (pyld[1]!=syncWord||syncWord==0x0){
-        *pixCnt = 0;
-        return NULL;
-    }
+    //if (pyld[1]!=syncWord||syncWord==0x0){
+    //    *pixCnt = 0;
+    //    return NULL;
+    //} TODO UNCOMMENT REMOVED FOR EASY NETCAT USAGE QUICKLY
     // Decode number of pixels, we don't have to send the entire strip if we don't want to
     uint16_t cnt = pyld[2] || pyld[3]<<8;
     
