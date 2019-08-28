@@ -14,6 +14,7 @@ var stripe = $("div#stripe"),
       paused:true
      });
 
+     let lastPush;
 
 function lineUpdate(tween)
 {
@@ -21,7 +22,6 @@ function lineUpdate(tween)
   stripepos = stripe.position();
   stripex = stripepos.left -10;
   ledstripex = parseInt((stripex*stripe_length.val())/288);
-  //console.log(ledstripex);
 
   var json = [];
   rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
@@ -33,7 +33,18 @@ function lineUpdate(tween)
     }
     
   }
-  json_out.val(JSON.stringify(json));
+  let jsonString = JSON.stringify(json);
+
+  if (jsonString !== lastPush) {
+    $.ajax('http://127.0.0.1:1234',{
+      'data': jsonString, 
+      'type': 'POST'
+    });
+    json_out.val(jsonString);
+  }
+
+  lastPush = jsonString;
+  
   
 }
 

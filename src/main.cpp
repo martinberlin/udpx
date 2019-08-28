@@ -208,7 +208,7 @@ void WiFiEvent(WiFiEvent_t event) {
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
-        if (receivedLength < 70) {
+        if (receivedLength < 90) {
         uint8_t *compressed  = new uint8_t[receivedLength];
         
         for ( int i = 0; i < packet.length(); i++ ) {
@@ -227,7 +227,7 @@ void WiFiEvent(WiFiEvent_t event) {
                     0);            /* pin task to core 1 */
         //reply to the client (We don't need to ACK now)
         //packet.printf("1");
-          delay(1);
+          delay(10);
         } else {
           // High probability that this is comming uncompressed
           uint8_t *uncompressed  = new uint8_t[receivedLength];
