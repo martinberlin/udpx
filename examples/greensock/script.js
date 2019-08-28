@@ -4,6 +4,7 @@ var stripe = $("div#stripe"),
     red = $("#r"), green = $("#g"), blue = $("#b"),
     stripe_length = $("#stripe_length"),
     json_out = $("#json_out"),
+    ip = $("#esp32_ip"),
     delay = $("#duration");
 
     tl1 = TweenMax.to(stripe, delay.val(), {

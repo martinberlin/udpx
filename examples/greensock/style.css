@@ -4,6 +4,10 @@
    margin-top: 5px;
 }
 
+#box_json {
+  margin-top: 15px;
+}
+
 #stripe {
   width:100px;
   height:100px;
