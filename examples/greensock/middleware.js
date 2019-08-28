@@ -9,7 +9,7 @@
  * 
  * Turn DEBUG false to disable console output
  */
-var DEBUG = true;
+var DEBUG = false;
 var PORT = 1234;       // Default port
 var HOST = '127.0.0.1';
 

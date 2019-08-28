@@ -42,15 +42,14 @@ function lineUpdate(tween)
             ip.val() +"&c="+ compressed,
             {
             'data': jsonString, 
-            'type': 'POST'
+            'type': 'POST',
+            async: false
             });
     json_out.val(jsonString);
   }
-
   lastPush = jsonString;
-  
-  
 }
+
 function colorIt() {
   stripe.css("background-color", "rgb(" + red.val() + "," + green.val() + "," + blue.val() +")");
 }

@@ -245,7 +245,7 @@ void WiFiEvent(WiFiEvent_t event) {
                     9,             /* priority of the task */
                     &brotliTask,   /* Task handle to keep track of created task */
                     0);            /* pin task to core 1 */
-            delay(1);
+            delay(9);
         }
 
         }); 
