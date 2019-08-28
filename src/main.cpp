@@ -1,11 +1,10 @@
 #include <WiFi.h>
 #include "AsyncUDP.h"
-#include "brotli/decode.h"
 #include <Config.h>
 #include <FS.h>
 #include "SPIFFS.h"
 #include <ArduinoJson.h>
-#include <Output.h>
+#include <pixels.h>
 extern "C" {
 	#include "freertos/FreeRTOS.h"
 	#include "freertos/timers.h"
@@ -29,13 +28,12 @@ bool debugMode = DEBUG_MODE;
 AsyncUDP udp;
 
 // Brotli decompression buffer
-#define BROTLI_DECOMPRESSION_BUFFER 3000
-//uint8_t * compressed;
+uint8_t * compressed;
 TaskHandle_t brotliTask;
 size_t receivedLength;
 BrotliDecoderResult brotli;
 // Output class and Mqtt message buffer
-Output output;
+PIXELS pix;
 String payloadBuffer;
 // SPIFFS to read presentation
 File fsFile;
@@ -91,7 +89,7 @@ String IpAddress2String(const IPAddress& ipAddress)
  */
 // Task sent to the core to decompress + push to Output
 void brTask(void * compressed){  
-    uint8_t *brOutBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
+    uint8_t * brOutBuffer = (uint8_t*)malloc(BROTLI_DECOMPRESSION_BUFFER);
     if (debugMode) Serial.println(" Heap: "+String(ESP.getFreeHeap()));
     size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
 
@@ -106,9 +104,14 @@ void brTask(void * compressed){
         // Deserialize the uncompressed JSON (strip error handling)
         deserializeJson(doc, brOutBuffer);
         JsonArray pixels = doc.as<JsonArray>();
-        output.setPixels(&pixels);
-	delete brOutBuffer;
-        //free(brOutBuffer); // Causing corrupted heap?
+        int i = 0;
+        // Unsure if this will work correctly
+        for (JsonArray pixel : pixels)
+        {
+          pix.show(i, pixel[0], pixel[1], pixel[2]);
+          i++;
+        }
+        delete brOutBuffer;
       }
       
       vTaskDelete(NULL);
@@ -196,7 +199,7 @@ void WiFiEvent(WiFiEvent_t event) {
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
-        uint8_t *compressed  = new uint8_t[receivedLength];
+         uint8_t *compressed  = new uint8_t[receivedLength];
         
         for ( int i = 0; i < packet.length(); i++ ) {
             uint8_t conv = (int) packet.data()[i];
@@ -341,7 +344,7 @@ void setup()
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
   // Pixels output
-  output.setup();
+  pix.init();
 }
 
 void loop() {
