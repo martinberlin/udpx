@@ -5,6 +5,7 @@ var stripe = $("div#stripe"),
     stripe_length = $("#stripe_length"),
     json_out = $("#json_out"),
     ip = $("#esp32_ip"),
+    compression = $("#compression"),
     delay = $("#duration");
 
     tl1 = TweenMax.to(stripe, delay.val(), {
@@ -36,10 +37,13 @@ function lineUpdate(tween)
   let jsonString = JSON.stringify(json);
 
   if (jsonString !== lastPush) {
-    $.ajax('http://127.0.0.1:1234',{
-      'data': jsonString, 
-      'type': 'POST'
-    });
+    compressed = compression.is(":checked") ?1:0;
+    $.ajax("http://127.0.0.1:1234?ip="+ 
+            ip.val() +"&c="+ compressed,
+            {
+            'data': jsonString, 
+            'type': 'POST'
+            });
     json_out.val(jsonString);
   }
 
@@ -47,15 +51,18 @@ function lineUpdate(tween)
   
   
 }
-
+function colorIt() {
+  stripe.css("background-color", "rgb(" + red.val() + "," + green.val() + "," + blue.val() +")");
+}
 btn1.click(function()
 {
-  stripe.css("background-color", "rgb(" + red.val() + "," + green.val() + "," + blue.val() +")");
+  colorIt();
   tl1.duration(delay.val());
   tl1.play(0);
 });
 btn2.click(function()
 {
+  colorIt();
   tl1.duration(delay.val());
   tl1.reverse();
 });
