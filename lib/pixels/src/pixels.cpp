@@ -34,6 +34,15 @@ void PIXELS::init(){
     strip.Show();
 }
 
+bool PIXELS::receive(uint8_t *pyld, unsigned length){
+    unsigned pixCnt = 0;
+    pixel *pattern = marshal(pyld, length, &pixCnt);
+    if(pixCnt==0){
+        return false;
+    }
+    this->show(pattern, pixCnt);
+}
+
 void PIXELS::show(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W){
     #ifdef RGBW
     strip.setPixelColor(location, RgbwColor(R,G,B,W));
@@ -72,7 +81,7 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, unsigned *pixCnt){
         *pixCnt = 0;
         return NULL;
     }
-    pixel *result = new pixel[cnt];
+    pixel result[cnt];
     // TODO Add logic to return if len is impossibly large or small
     for(uint16_t i = 0; i<cnt; i++){
         #ifdef RGBW
@@ -91,5 +100,6 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, unsigned *pixCnt){
     // TODO Add CRC check before setting pixCnt
     *pixCnt = cnt;
 
-    return result; // REMOVE WHEN FUNCTION FINISHED
+    return result; 
 }
+

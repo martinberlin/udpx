@@ -31,7 +31,6 @@ AsyncUDP udp;
 uint8_t * compressed;
 TaskHandle_t brotliTask;
 size_t receivedLength;
-BrotliDecoderResult brotli;
 // Output class and Mqtt message buffer
 PIXELS pix;
 String payloadBuffer;
@@ -44,6 +43,11 @@ struct config {
   bool compression = true;
 } internalConfig;
 
+
+typedef struct {
+  unsigned size;
+  uint8_t *pyld;
+}taskParams;
 
 /**
  * Generic message printer. Modify this if you want to send this messages elsewhere (Display)
@@ -88,35 +92,12 @@ String IpAddress2String(const IPAddress& ipAddress)
  TODO: Research how to pass an array in notused Parameter (compressed data)
  */
 // Task sent to the core to decompress + push to Output
-void brTask(void * compressed){  
-    uint8_t * brOutBuffer = (uint8_t*)malloc(BROTLI_DECOMPRESSION_BUFFER);
-    if (debugMode) Serial.println(" Heap: "+String(ESP.getFreeHeap()));
-    size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
-
-    brotli = BrotliDecoderDecompress(
-      receivedLength,
-      (const uint8_t *)compressed,
-      &bufferLength,
-      brOutBuffer);
-      delete compressed;
-
-      if (brotli == 1) {
-        // Deserialize the uncompressed JSON (strip error handling)
-        deserializeJson(doc, brOutBuffer);
-        JsonArray pixels = doc.as<JsonArray>();
-        int i = 0;
-        // Unsure if this will work correctly
-        for (JsonArray pixel : pixels)
-        {
-          pix.show(i, pixel[0], pixel[1], pixel[2]);
-          i++;
-        }
-        delete brOutBuffer;
-      }
-      
-      vTaskDelete(NULL);
-      // https://www.freertos.org/implementing-a-FreeRTOS-task.html
-      // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
+void brTask(void * input){
+  taskParams *p = static_cast<taskParams*>(input);      
+  pix.receive(p->pyld, p->size);
+  vTaskDelete(NULL);
+  // https://www.freertos.org/implementing-a-FreeRTOS-task.html
+  // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
 }
 
 void WiFiEvent(WiFiEvent_t event) {
@@ -199,19 +180,19 @@ void WiFiEvent(WiFiEvent_t event) {
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
-         uint8_t *compressed  = new uint8_t[receivedLength];
+         uint8_t *buffer  = new uint8_t[receivedLength];
         
         for ( int i = 0; i < packet.length(); i++ ) {
-            uint8_t conv = (int) packet.data()[i];
-            compressed[i] = conv;
-            //Serial.print(conv);Serial.print(",");
+            buffer[i] = packet.data()[i]; // Can be shortened to this right?
         }
+
+        taskParams params = {receivedLength, buffer};
 
           xTaskCreatePinnedToCore(
                     brTask,        /* Task function. */
                     "uncompress",  /* name of task. */
                     20000,         /* Stack size of task */
-                    compressed,          /* parameter of the task */
+                    &params,          /* parameter of the task */
                     9,             /* priority of the task */
                     &brotliTask,   /* Task handle to keep track of created task */
                     0);            /* pin task to core 1 */
