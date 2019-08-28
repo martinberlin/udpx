@@ -116,6 +116,18 @@ void brTask(void * compressed){
       // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
 }
 
+/**
+ * Uncompressed data incoming
+ */
+void unTask(void * uncompressed)
+{  
+      deserializeJson(doc, (const uint8_t *)uncompressed);
+      JsonArray pixels = doc.as<JsonArray>();
+      output.setPixels(&pixels);
+      delete uncompressed;
+      vTaskDelete(NULL);
+}
+
 void WiFiEvent(WiFiEvent_t event) {
     Serial.printf("[WiFi-event] event: %d\n", event);
     switch(event) {
@@ -196,6 +208,7 @@ void WiFiEvent(WiFiEvent_t event) {
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
 
+        if (receivedLength < 70) {
         uint8_t *compressed  = new uint8_t[receivedLength];
         
         for ( int i = 0; i < packet.length(); i++ ) {
@@ -214,8 +227,29 @@ void WiFiEvent(WiFiEvent_t event) {
                     0);            /* pin task to core 1 */
         //reply to the client (We don't need to ACK now)
         //packet.printf("1");
-        delay(10);
+          delay(1);
+        } else {
+          // High probability that this is comming uncompressed
+          uint8_t *uncompressed  = new uint8_t[receivedLength];
+        
+        for ( int i = 0; i < packet.length(); i++ ) {
+            uint8_t conv = (int) packet.data()[i];
+            uncompressed[i] = conv;
+            //Serial.print(conv);Serial.print(",");
+        }
+          xTaskCreatePinnedToCore(
+                    unTask,        /* Task function. */
+                    "decode",  /* name of task. */
+                    20000,         /* Stack size of task */
+                    uncompressed,          /* parameter of the task */
+                    9,             /* priority of the task */
+                    &brotliTask,   /* Task handle to keep track of created task */
+                    0);            /* pin task to core 1 */
+            delay(1);
+        }
+
         }); 
+        
     } else {
       Serial.println("UDP Lister could not be started");
     }
