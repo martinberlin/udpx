@@ -95,6 +95,7 @@ String IpAddress2String(const IPAddress& ipAddress)
 void brTask(void * input){
   taskParams *p = static_cast<taskParams*>(input);      
   pix.receive(p->pyld, p->size);
+  delete p->pyld;
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
   // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
