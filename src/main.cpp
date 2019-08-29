@@ -101,7 +101,7 @@ void brTask(void * input){
   Serial.println();
   pix.receive(p->pyld, p->size);
   Serial.println("Here 1");
-  delete p;
+  delete p->pyld;
   Serial.println("Here 2");
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
