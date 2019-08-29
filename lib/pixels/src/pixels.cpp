@@ -35,7 +35,7 @@ void PIXELS::init(){
 }
 
 bool PIXELS::receive(uint8_t *pyld, unsigned length){
-    unsigned pixCnt = 0;
+    uint16_t pixCnt = 0;
     pixel *pattern = marshal(pyld, length, &pixCnt);
     Serial.println("Marhalled");
     if(pixCnt==0){
@@ -79,7 +79,7 @@ void PIXELS::show(pixel *pixels, unsigned cnt){
     strip.Show();
 }
 
-pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, unsigned *pixCnt){
+pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
     if(pyld[0]!=0x50){
         // Set pixCnt to zero as we have not decoded any pixels and return NULL
         *pixCnt = 0;
@@ -91,7 +91,8 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, unsigned *pixCnt){
     //} TODO UNCOMMENT REMOVED FOR EASY NETCAT USAGE QUICKLY
     // Decode number of pixels, we don't have to send the entire strip if we don't want to
     uint16_t cnt = pyld[2] || pyld[3]<<8;
-    
+    Serial.print("[ DEUG ] From marshal - ");
+    Serial.println(cnt);
     if(cnt>PIXELCOUNT){
         // We got more pixels than the strip allows
         *pixCnt = 0;
