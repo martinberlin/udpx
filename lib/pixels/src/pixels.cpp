@@ -103,7 +103,7 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, unsigned *pixCnt){
 
     // TODO Add CRC check before setting pixCnt
     *pixCnt = cnt;
-
+    Serial.println("Returning from marshal");
     return result; 
 }
 
