@@ -94,7 +94,6 @@ String IpAddress2String(const IPAddress& ipAddress)
 // Task sent to the core to decompress + push to Output
 void brTask(void * input){
   taskParams *p = static_cast<taskParams*>(input);   
-  uint16_t ptr = (uint16_t)p->pyld;
   for(unsigned i =0; i<p->size; i++){
     Serial.print(p->pyld[i], HEX);
     Serial.print(" ");
@@ -102,9 +101,8 @@ void brTask(void * input){
   Serial.println();
   pix.receive(p->pyld, p->size);
   Serial.println("Here 1");
-  Serial.print("POINTER VALUE - ");
-  Serial.println(ptr, HEX);
-  delete p->pyld;
+  
+  delete []p->pyld;
   Serial.println("Here 2");
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
@@ -197,11 +195,7 @@ void WiFiEvent(WiFiEvent_t event) {
             buffer[i] = packet.data()[i]; // Can be shortened to this right?
         }
 
-        taskParams params = {receivedLength, buffer};
-
-        uint16_t ptr = (uint16_t)buffer;
-        Serial.print("POINTER VALUE - ");
-        Serial.println(ptr, HEX);
+        taskParams params = {receivedLength, buffer};        
 
           xTaskCreatePinnedToCore(
                     brTask,        /* Task function. */
