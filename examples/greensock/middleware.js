@@ -28,7 +28,7 @@ http.createServer((request, response) => {
     body.push(chunk);
 
   }).on('end', () => {
-    if (DEBUG) console.log("body L:"+body.length +" \ncontents:"+body)
+    //if (DEBUG) console.log("body L:"+body.length +" \ncontents:"+body)
     
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;

@@ -5,3 +5,4 @@
 lib/Config/Config.h
 examples/greensock/node_modules/
 examples/greensock/package-lock.json
+examples/greensock/npm-debug.log
