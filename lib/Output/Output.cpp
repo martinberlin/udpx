@@ -3,7 +3,7 @@
 #endif
 #include "Output.h"
 
-#define PIXELCOUNT 144
+#define PIXELCOUNT 72
 #define PIXELPIN 19
 #ifdef ESP32
   NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXELCOUNT, PIXELPIN);
