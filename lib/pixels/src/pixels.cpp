@@ -37,10 +37,14 @@ void PIXELS::init(){
 bool PIXELS::receive(uint8_t *pyld, unsigned length){
     unsigned pixCnt = 0;
     pixel *pattern = marshal(pyld, length, &pixCnt);
+    Serial.println("Marhalled");
     if(pixCnt==0){
         return false;
     }
+
     this->show(pattern, pixCnt);
+    Serial.println("SHOWN!");
+    return true;
 }
 
 void PIXELS::show(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W){
