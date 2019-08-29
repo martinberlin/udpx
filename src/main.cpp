@@ -101,7 +101,8 @@ void brTask(void * input){
   Serial.println();
   pix.receive(p->pyld, p->size);
   Serial.println("Here 1");
-  
+  Serial.print("PTR VALUE - ");
+  Serial.println((long)p->pyld, HEX);
   delete []p->pyld;
   Serial.println("Here 2");
   vTaskDelete(NULL);
@@ -194,7 +195,8 @@ void WiFiEvent(WiFiEvent_t event) {
         for ( int i = 0; i < packet.length(); i++ ) {
             buffer[i] = packet.data()[i]; // Can be shortened to this right?
         }
-
+        Serial.print("PTR VALUE - ");
+        Serial.println((long)buffer);
         taskParams params = {receivedLength, buffer};        
 
           xTaskCreatePinnedToCore(
