@@ -55,6 +55,7 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
         Serial.println(")");
     }
     this->show(pattern, pixCnt);
+    delete pattern;
     Serial.println("SHOWN!");
     return true;
 }
@@ -103,7 +104,7 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
         Serial.println("COUNT IS ZERO!!!");
         return false;
     }
-    pixel result[cnt];
+    pixel *result = new pixel[cnt];
     // TODO Add logic to return if len is impossibly large or small
     for(uint16_t i = 0; i<cnt; i++){
         #ifdef RGBW
