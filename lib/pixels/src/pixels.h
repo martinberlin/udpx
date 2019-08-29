@@ -52,9 +52,10 @@ class PIXELS
     bool receive(uint8_t *pyld, unsigned len);
     // sync will return the sync byte as a uint8_t to ensure the library and controller are on the same page
     uint8_t sync();
-    // This version of show takes a pixel location, and a R, G, B (, W if enabled) value to change the strip
-    // There is another version that will take an array of pixels
-    void show(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W = 0);
+    // Write sets the LED at the location to R,G,B to the values provided for the next show()
+    void write(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W = 0);
+    // Show writes the previously made write() calls to the array of LEDs
+    void show();
     // This version of show takes a pointer to an array of pixels, as well as how long the array is. Be sure the array is in order from LED location 0 onward
     // There is another versio that will accapt a single pixel and location
     void show(pixel *pixels, unsigned cnt);

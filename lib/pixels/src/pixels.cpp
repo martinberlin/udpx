@@ -37,7 +37,6 @@ void PIXELS::init(){
 bool PIXELS::receive(uint8_t *pyld, unsigned length){
     uint16_t pixCnt = 0;
     pixel *pattern = marshal(pyld, length, &pixCnt);
-    Serial.println("Marhalled");
     if(pixCnt==0){
         Serial.println("Returning from failed arshal");
         return false;
@@ -60,12 +59,15 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
     return true;
 }
 
-void PIXELS::show(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W){
+void PIXELS::write(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W){
     #ifdef RGBW
     strip.setPixelColor(location, RgbwColor(R,G,B,W));
     #else
     strip.SetPixelColor(location, RgbColor(R,G,B));
     #endif
+}
+
+void PIXELS::show(){
     strip.Show();
 }
 
