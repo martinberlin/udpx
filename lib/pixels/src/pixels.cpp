@@ -98,6 +98,11 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
         *pixCnt = 0;
         return NULL;
     }
+    if (cnt ==0)
+    {
+        Serial.println("COUNT IS ZERO!!!");
+        return false;
+    }
     pixel result[cnt];
     // TODO Add logic to return if len is impossibly large or small
     for(uint16_t i = 0; i<cnt; i++){
