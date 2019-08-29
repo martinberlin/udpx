@@ -93,9 +93,17 @@ String IpAddress2String(const IPAddress& ipAddress)
  */
 // Task sent to the core to decompress + push to Output
 void brTask(void * input){
-  taskParams *p = static_cast<taskParams*>(input);      
-  pix.receive(p->pyld, p->size);
-  delete p->pyld;
+  Serial.println("[ DEBUG ] Started task with packet");
+  AsyncUDPPacket *packet = static_cast<AsyncUDPPacket*>(input);
+
+  Serial.print("[ DEBUG ] Got: ");
+  for(unsigned i=0; i<packet->length();i++){
+    Serial.print(packet->data()[i],HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
+
+  pix.receive(packet->data(), packet->length());
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
   // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
@@ -170,13 +178,14 @@ void WiFiEvent(WiFiEvent_t event) {
 
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
+      /*
         //printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
         printMessage("Len: ", false);
         printMessage(String(packet.length()), false);
-        /* printMessage(" Data: ",false);
-        if (debugMode) {
-          Serial.write(packet.data(), packet.length());
-        } */
+        // printMessage(" Data: ",false);
+        //if (debugMode) {
+        //  Serial.write(packet.data(), packet.length());
+        //} 
         
         // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
         receivedLength = packet.length();
@@ -188,12 +197,13 @@ void WiFiEvent(WiFiEvent_t event) {
         }
 
         taskParams params = {receivedLength, buffer};
+        */
 
           xTaskCreatePinnedToCore(
                     brTask,        /* Task function. */
                     "uncompress",  /* name of task. */
                     20000,         /* Stack size of task */
-                    &params,          /* parameter of the task */
+                    &packet,          /* parameter of the task */
                     9,             /* priority of the task */
                     &brotliTask,   /* Task handle to keep track of created task */
                     0);            /* pin task to core 1 */
