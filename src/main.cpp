@@ -105,7 +105,7 @@ void brTask(void * input){
   Serial.println((long)p->pyld, HEX);
   Serial.print("PTR PTR LOC - ");
   Serial.println((long)&p->pyld, HEX);
-  delete []p->pyld;
+  delete []static_cast<taskParams*>(input)->pyld;
   Serial.println("Here 2");
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
