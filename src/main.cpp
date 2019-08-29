@@ -103,6 +103,8 @@ void brTask(void * input){
   Serial.println("Here 1");
   Serial.print("PTR VALUE - ");
   Serial.println((long)p->pyld, HEX);
+  Serial.print("PTR PTR LOC - ");
+  Serial.println((long)*p->pyld);
   delete []p->pyld;
   Serial.println("Here 2");
   vTaskDelete(NULL);
