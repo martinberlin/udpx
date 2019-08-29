@@ -201,7 +201,16 @@ void WiFiEvent(WiFiEvent_t event) {
         Serial.println((long)buffer, HEX);
         Serial.print("PTR VALUE AGAIN - ");
         Serial.println((long)&buffer, HEX);
-        taskParams params = {receivedLength, buffer};        
+        taskParams params = {receivedLength, buffer};
+
+        Serial.print("PARAMS LOCATION - ");
+        Serial.println((long) &params);
+
+        Serial.print("PARAMS PYLD LOCATION - ");
+        Serial.println((long) &params.pyld);
+
+        Serial.println("PARAMS SET AT PYLD - ");
+        Serial.println((long)params.pyld);
 
           xTaskCreatePinnedToCore(
                     brTask,        /* Task function. */
