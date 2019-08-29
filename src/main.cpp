@@ -104,7 +104,7 @@ void brTask(void * input){
   Serial.print("PTR VALUE - ");
   Serial.println((long)p->pyld, HEX);
   Serial.print("PTR PTR LOC - ");
-  Serial.println((long)&p->pyld);
+  Serial.println((long)&p->pyld, HEX);
   delete []p->pyld;
   Serial.println("Here 2");
   vTaskDelete(NULL);
@@ -199,6 +199,8 @@ void WiFiEvent(WiFiEvent_t event) {
         }
         Serial.print("PTR VALUE - ");
         Serial.println((long)buffer, HEX);
+        Serial.print("PTR VALUE AGAIN - ");
+        Serial.println((long)&buffer, HEX);
         taskParams params = {receivedLength, buffer};        
 
           xTaskCreatePinnedToCore(
