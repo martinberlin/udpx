@@ -39,9 +39,21 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
     pixel *pattern = marshal(pyld, length, &pixCnt);
     Serial.println("Marhalled");
     if(pixCnt==0){
+        Serial.println("Returning from failed arshal");
         return false;
     }
-
+    Serial.print("[ DEBUG ] Pix cnt is ");
+    Serial.println(pixCnt);
+    Serial.println("About to show...");
+    for(uint i=0; i<pixCnt; i++){
+        Serial.print("Got LED value RGB(");
+        Serial.print(pattern[i].R);
+        Serial.print(",");
+        Serial.print(pattern[i].G);
+        Serial.print(",");
+        Serial.print(pattern[i].B);
+        Serial.println(")");
+    }
     this->show(pattern, pixCnt);
     Serial.println("SHOWN!");
     return true;
