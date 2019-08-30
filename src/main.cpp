@@ -93,20 +93,24 @@ String IpAddress2String(const IPAddress& ipAddress)
  */
 // Task sent to the core to decompress + push to Output
 void brTask(void * input){
-  taskParams *p = static_cast<taskParams*>(input);   
-  for(unsigned i =0; i<p->size; i++){
+  taskParams *p = static_cast<taskParams*>(input);  
+  pix.receive(p->pyld, p->size);
+
+  if (debugMode) {
+    Serial.println(" Heap: "+String(ESP.getFreeHeap())); 
+  /* for(unsigned i =0; i<p->size; i++){
     Serial.print(p->pyld[i], HEX);
     Serial.print(" ");
   }
   Serial.println();
-  pix.receive(p->pyld, p->size);
   Serial.println("Here 1");
   Serial.print("PTR VALUE - ");
   Serial.println((long)p->pyld, HEX);
   Serial.print("PTR PTR LOC - ");
   Serial.println((long)&p->pyld, HEX);
   delete []static_cast<taskParams*>(input)->pyld;
-  Serial.println("Here 2");
+  Serial.println("Here 2"); */
+  }
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
   // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
@@ -222,7 +226,8 @@ void WiFiEvent(WiFiEvent_t event) {
                     0);            /* pin task to core 1 */
         //reply to the client (We don't need to ACK now)
         //packet.printf("1");
-        delay(10);
+        delete(buffer);
+        delay(0);
         }); 
     } else {
       Serial.println("UDP Lister could not be started");
