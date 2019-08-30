@@ -5,6 +5,7 @@
 #include "SPIFFS.h"
 #include <ArduinoJson.h>
 #include <pixels.h>
+#include <ESPmDNS.h>
 extern "C" {
 	#include "freertos/FreeRTOS.h"
 	#include "freertos/timers.h"
@@ -103,61 +104,13 @@ void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
     case SYSTEM_EVENT_STA_GOT_IP:
       Serial.println("WiFi connected: ");Serial.println(WiFi.localIP());
-
-      // Read presentation template from FS json only if MQTT_ENABLE is true
-      if (MQTT_ENABLE) {
-      if (SPIFFS.begin())
-      {
-        printMessage("SPIFFS started. Checking for presentation file: ", false);
-        printMessage(FIRMWARE_PRESENTATION);
-        if (SPIFFS.exists(FIRMWARE_PRESENTATION))
-        {
-          printMessage("Presentation file exists. Size in bytes: ", false);
-
-          File configFile = SPIFFS.open(FIRMWARE_PRESENTATION, FILE_READ);
-          presentation = configFile.readString();
-          presentation.replace("<chipid>", bssid);
-          presentation.replace("<udp_ip>", IpAddress2String(WiFi.localIP()));
-          if (configFile)
-          {
-            size_t size = configFile.size();
-            printMessage(String(size));
-            DynamicJsonDocument doc(capacity);
-            // Deserialize the JSON document
-            DeserializationError error = deserializeJson(doc, presentation);
-            if (error)
-            {
-              printMessage("ERR parsing presentation file");
-              printMessage(error.c_str());
-              return;
-            }
-            
-            // TODO: Check if this properties exist in JSON otherwise die here with a proper message
-            strcpy(internalConfig.title, doc["title"]);
-            internalConfig.compression = doc["compression"];
-            printMessage("Controller title: " + String(internalConfig.title));
-            printMessage("=============== Presentation ready ===============");
-            printMessage(presentation);
+        if (!MDNS.begin("p")) {
+          while(1) { 
+          delay(100);
           }
-          else
-          {
-            printMessage("ERR load config");
-          }
-          configFile.close();
         }
-        else
-        {
-          printMessage("Config file not found");
-        }
-      }
-      else
-      {
-        printMessage("SPIFFs cannot start. FFS Formatted?");
-      }
-
-      } else {
-        Serial.println("MQTT_ENABLE is disabled per Config. Spiffs presentation read skipped");
-      }
+        MDNS.addService("http", "tcp", 80);
+        printMessage("p.local mDns started");
 
       if(udp.listen(UDP_PORT)) {
         Serial.println("UDP Listening on IP: ");
