@@ -9,9 +9,7 @@ extern "C" {
 	#include "freertos/FreeRTOS.h"
 	#include "freertos/timers.h"
 }
-#include <AsyncMqttClient.h>
 
-AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
 String lastWill;
@@ -68,10 +66,6 @@ void connectToWifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 }
 
-void connectToMqtt() {
-  Serial.println("Connecting to MQTT...");
-  mqttClient.connect();
-}
 /**
  * Convert the IP to string 
  */
@@ -160,8 +154,7 @@ void WiFiEvent(WiFiEvent_t event) {
       {
         printMessage("SPIFFs cannot start. FFS Formatted?");
       }
-    
-        connectToMqtt(); 
+
       } else {
         Serial.println("MQTT_ENABLE is disabled per Config. Spiffs presentation read skipped");
       }
@@ -222,64 +215,6 @@ void WiFiEvent(WiFiEvent_t event) {
     }
 }
 
-void onMqttConnect(bool sessionPresent) {
-  printMessage("Connected to MQTT. Sending presentation to topic: ", false);
-  printMessage(PRESENTATION_TOPIC);
-  printMessage("Last will: ", false);
-  printMessage(lastWill);
-  mqttClient.publish(lastWill.c_str(), 1, true, "true");
-  // TODO: Read presentation from JSON and publish to PRESENTATION_TOPIC
-  mqttClient.publish(PRESENTATION_TOPIC, 1, true, presentation.c_str());
-  
-  // Subscribe to receive topic (TODO: Later this should be dynamic)
-  printMessage("Subscribing to IN_TOPIC, packetId: ", false);
-  uint16_t packetIdSub = mqttClient.subscribe(IN_TOPIC, 0);
-  printMessage(String(packetIdSub));
-}
-
-void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  Serial.println("Disconnected from MQTT.");
-
-  if (WiFi.isConnected()) {
-    xTimerStart(mqttReconnectTimer, 0);
-  }
-}
-
-void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-  Serial.println("Subscribe acknowledged.");
-  printMessage("  packetId: ");
-  printMessage(String(packetId));
-  printMessage("  qos: ");
-  printMessage(String(qos));
-}
-
-void onMqttUnsubscribe(uint16_t packetId) {
-  Serial.println("Unsubscribe acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
-}
-
-void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, unsigned int len, size_t index, size_t total) {
-// TODO: This topic should be dynamic 
-   if (0 == strcmp(topic, "pixelcrasher/pixel-in/4ae5b9/hsl"))
-  {
-    // Enable buffering of partial messages. TODO: Do this with char not with String!
-    if (index==0) {               // at start
-    payloadBuffer = "";
-    }
-    payloadBuffer += payload;
-    if (! (index + len == total)) { // at end
-      return;
-    }  
-  }
-}
-
-void onMqttPublish(uint16_t packetId) {
-  Serial.println("Publish acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
-}
-
 void setup()
 {
   Serial.begin(115200);
@@ -288,25 +223,10 @@ void setup()
   strcpy(internalConfig.title, bssid);
   
   // Set up automatic reconnect timers
-  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
   connectToWifi();
 
   WiFi.onEvent(WiFiEvent);
-  // TODO: Update this with new define STATUS_TOPIC
-  lastWill = "pixelcrasher/online-status/"+String(bssid);
-
-  // keepalive period, broker sets device offline after this period
-  mqttClient.setKeepAlive(15);
-  mqttClient.setMaxTopicLength(2000);
-  mqttClient.setWill(lastWill.c_str(), 1, true, "false");
-  mqttClient.onConnect(onMqttConnect);
-  mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onSubscribe(onMqttSubscribe);
-  mqttClient.onUnsubscribe(onMqttUnsubscribe);
-  mqttClient.onMessage(onMqttMessage);
-  mqttClient.onPublish(onMqttPublish);
-  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
   // Pixels output
   pix.init();
 }
