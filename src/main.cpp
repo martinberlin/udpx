@@ -93,23 +93,11 @@ String IpAddress2String(const IPAddress& ipAddress)
  */
 // Task sent to the core to decompress + push to Output
 void brTask(void * input){
-  taskParams *p = static_cast<taskParams*>(input);  
-  pix.receive(p->pyld, p->size);
+  AsyncUDPPacket *p = static_cast<AsyncUDPPacket*>(input);  
+  pix.receive(p->data(), p->length());
 
   if (debugMode) {
     Serial.println(" Heap: "+String(ESP.getFreeHeap())); 
-  /* for(unsigned i =0; i<p->size; i++){
-    Serial.print(p->pyld[i], HEX);
-    Serial.print(" ");
-  }
-  Serial.println();
-  Serial.println("Here 1");
-  Serial.print("PTR VALUE - ");
-  Serial.println((long)p->pyld, HEX);
-  Serial.print("PTR PTR LOC - ");
-  Serial.println((long)&p->pyld, HEX);
-  delete []static_cast<taskParams*>(input)->pyld;
-  Serial.println("Here 2"); */
   }
   vTaskDelete(NULL);
   // https://www.freertos.org/implementing-a-FreeRTOS-task.html
@@ -188,45 +176,11 @@ void WiFiEvent(WiFiEvent_t event) {
         //printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
         printMessage("Len: ", false);
         printMessage(String(packet.length()), false);
-        /* printMessage(" Data: ",false);
-        if (debugMode) {
-          Serial.write(packet.data(), packet.length());
-        } */
-        
-        // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
-        receivedLength = packet.length();
-
-         uint8_t *buffer  = new uint8_t[receivedLength];
-        
-        for ( int i = 0; i < packet.length(); i++ ) {
-            buffer[i] = packet.data()[i]; // Can be shortened to this right?
-        }
-        Serial.print("PTR VALUE - ");
-        Serial.println((long)buffer, HEX);
-        Serial.print("PTR VALUE AGAIN - ");
-        Serial.println((long)&buffer, HEX);
-        taskParams params = {receivedLength, buffer};
-
-        Serial.print("PARAMS LOCATION - ");
-        Serial.println((long) &params);
-
-        Serial.print("PARAMS PYLD LOCATION - ");
-        Serial.println((long) &params.pyld);
-
-        Serial.println("PARAMS SET AT PYLD - ");
-        Serial.println((long)params.pyld);
-
-          xTaskCreatePinnedToCore(
-                    brTask,        /* Task function. */
-                    "uncompress",  /* name of task. */
-                    20000,         /* Stack size of task */
-                    &params,          /* parameter of the task */
-                    9,             /* priority of the task */
-                    &brotliTask,   /* Task handle to keep track of created task */
-                    0);            /* pin task to core 1 */
-        //reply to the client (We don't need to ACK now)
-        //packet.printf("1");
-        delete(buffer);
+        unsigned long t = micros();
+        pix.receive(packet.data(), packet.length());
+        Serial.print("Took ");
+        Serial.print(micros()-t);
+        Serial.println("micro seconds to consume");
         delay(0);
         }); 
     } else {

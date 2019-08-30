@@ -41,9 +41,7 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
         Serial.println("Returning from failed arshal");
         return false;
     }
-    Serial.print("[ DEBUG ] Pix cnt is ");
-    Serial.println(pixCnt);
-    Serial.println("About to show...");
+    /*
     for(uint i=0; i<pixCnt; i++){
         Serial.print("Got LED value RGB(");
         Serial.print(pattern[i].R);
@@ -53,9 +51,9 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
         Serial.print(pattern[i].B);
         Serial.println(")");
     }
+    */
     this->show(pattern, pixCnt);
     delete pattern;
-    Serial.println("SHOWN!");
     return true;
 }
 
@@ -84,6 +82,7 @@ void PIXELS::show(pixel *pixels, unsigned cnt){
 
 pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
     if(pyld[0]!=0x50){
+        Serial.println("Missing checkvalue");
         // Set pixCnt to zero as we have not decoded any pixels and return NULL
         *pixCnt = 0;
         return NULL;
@@ -97,6 +96,7 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
     Serial.print("[ DEUG ] From marshal - ");
     Serial.println(cnt);
     if(cnt>PIXELCOUNT){
+        Serial.println("Invlid cnt");
         // We got more pixels than the strip allows
         *pixCnt = 0;
         return NULL;
@@ -124,7 +124,6 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
 
     // TODO Add CRC check before setting pixCnt
     *pixCnt = cnt;
-    Serial.println("Returning from marshal");
     return result; 
 }
 
