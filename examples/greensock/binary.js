@@ -38,12 +38,14 @@ function convertPixel(x) {
   var bytesToPost = new Uint8Array(buffer); 
   bi = 0;
   // header bytes
-  bytesToPost[bi] = 80;bi++; // p
-  bytesToPost[bi] = 0;bi++;  // Future features (not used)
-  bytesToPost[bi] = 0;bi++;  // unsigned 8-bit LED channel number
-  bytesToPost[bi] = stripe_length.val();bi++; // count(pixels) 16 bit, next too
-  bytesToPost[bi] = 0;bi++;  // Second part of count(pixels) not used here for now
-   
+  hByte = [80,0,0,stripe_length.val(),0];
+  bytesToPost[bi] = hByte[0];bi++;  // p
+  bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
+  bytesToPost[bi] = hByte[2];bi++;  // unsigned 8-bit LED channel number
+  bytesToPost[bi] = hByte[3];bi++;  // count(pixels) 16 bit, next too
+  bytesToPost[bi] = hByte[4];bi++;  // Second part of count(pixels) not used here for now
+  displayHex += toHexString(hByte); // Start the preview in HEX with headers
+
   for (var k = 1; k <= parseInt(stripe_length.val()); k++) {
     if (x >= k-1 && x <= k+1) {
       bytesToPost[bi] = parseInt(red.val());bi++;
