@@ -21,12 +21,6 @@ const http = require('http');
 var url = require('url');
 var client = dgram.createSocket('udp4');
 
-function toHexString(byteArray) {
-  let out = Array.from(byteArray, function(byte) {
-    return ('0' + (byte & 0xFF).toString(16)).slice(-2).toUpperCase();
-  }).join(' '); 
-   return out+' ';
-}
 
 http.createServer((request, response) => {
   let body = [];
@@ -34,7 +28,7 @@ http.createServer((request, response) => {
     body.push(chunk);
 
   }).on('end', () => {
-    if (DEBUG) console.log("\ncontents:"+body)
+    if (DEBUG) console.log("body L:"+body.length +" \ncontents:"+body)
     
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
@@ -42,12 +36,10 @@ http.createServer((request, response) => {
 
     // Is compressed?
     if (query.c === "0") {
-     //var outBuff = Buffer.from(body.toString(), 'utf8');
-     var outBuff = Buffer.concat(body);
-        console.log(body);
-
+     var outBuff = Buffer.from(body.toString(), 'utf8');
+     
     } else {
-      // Compress the data with Brotli
+      // Compress the json with Brotli
        outBuff = brotli.compress(Buffer.from(body.toString(), 'utf8'), {
         quality: 1, // 0 - 11
         lgwin: 16
