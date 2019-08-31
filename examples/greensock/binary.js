@@ -37,6 +37,13 @@ function convertPixel(x) {
   // Treat buffer as a view of 8-bit unsigned integer 
   var bytesToPost = new Uint8Array(buffer); 
   bi = 0;
+  // header bytes
+  bytesToPost[bi] = 80;bi++; // p
+  bytesToPost[bi] = 0;bi++;  // Future features (not used)
+  bytesToPost[bi] = 0;bi++;  // unsigned 8-bit LED channel number
+  bytesToPost[bi] = stripe_length.val();bi++; // count(pixels) 16 bit, next too
+  bytesToPost[bi] = 0;bi++;  // Second part of count(pixels) not used here for now
+   
   for (var k = 1; k <= parseInt(stripe_length.val()); k++) {
     if (x >= k-1 && x <= k+1) {
       bytesToPost[bi] = parseInt(red.val());bi++;
@@ -53,13 +60,8 @@ function convertPixel(x) {
       bytes.push(off);
     }
   }
-
-  console.log(bytesToPost);
-  
   
   if (displayHex !== lastPush) { 
-
-
      $.ajax("http://127.0.0.1:1234?ip="+ ip.val() +"&c=0",
       {
       'data': bytesToPost, 
@@ -69,7 +71,6 @@ function convertPixel(x) {
       crossDomain: true,
       contentType: false
       }); 
-    
   }
   output.val(displayHex);
   lastPush = displayHex;
@@ -104,7 +105,5 @@ btn2.click(function()
 
 btn3.click(function()
 {
-  //rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
-  //console.log(toHexString(rgb));
   convertPixel(10);
 });

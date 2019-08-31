@@ -1,7 +1,6 @@
 /**
  * Middleware will just receive a POST with :
  * data - Json data (Method: POST)
- * compressed - Has to be compressed? true as default (GET)
  * ip - Destination ip (GET)
  * port - Optional defaults to 1234 (GET)
  * 
@@ -14,19 +13,10 @@ var PORT = 1234;       // Default port
 var HOST = '127.0.0.1';
 
 // Requires
-//var bodyParser = require('body-parser');
 var dgram = require('dgram');
-var brotli = require('brotli');
 const http = require('http');
 var url = require('url');
 var client = dgram.createSocket('udp4');
-
-function toHexString(byteArray) {
-  let out = Array.from(byteArray, function(byte) {
-    return ('0' + (byte & 0xFF).toString(16)).slice(-2).toUpperCase();
-  }).join(' '); 
-   return out+' ';
-}
 
 http.createServer((request, response) => {
   let body = [];
@@ -34,30 +24,14 @@ http.createServer((request, response) => {
     body.push(chunk);
 
   }).on('end', () => {
-    if (DEBUG) console.log("\ncontents:"+body)
     
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
-
-
-    // Is compressed?
-    if (query.c === "0") {
-     //var outBuff = Buffer.from(body.toString(), 'utf8');
-     var outBuff = Buffer.concat(body);
-        console.log(body);
-
-    } else {
-      // Compress the data with Brotli
-       outBuff = brotli.compress(Buffer.from(body.toString(), 'utf8'), {
-        quality: 1, // 0 - 11
-        lgwin: 16
-      }); 
-    }
-    // TODO: FIX ip address + compression should come by GET
+    var outBuff = Buffer.concat(body);
+    if (DEBUG)   console.log(body);
     sendBuffer(outBuff, query.ip);
 
-    body = '1';//Buffer.concat(body).toString();
-    response.end(body);
+    response.end();
   })
   .on('error', (err) => {
     console.error(err);
@@ -66,12 +40,10 @@ http.createServer((request, response) => {
 
 
 function sendBuffer(inBuffer, outHost) {
-
     client.send(inBuffer, 0, inBuffer.length, PORT, outHost, function(err, bytes) {
         if (err) throw err;
 
-        if (DEBUG) console.log('Sent: ' + inBuffer.toString() + ' to ' + outHost +':'+ PORT);
+        if (DEBUG) console.log('Sent to ' + outHost +':'+ PORT);
     });
-
 }
     
