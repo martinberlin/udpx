@@ -3,3 +3,5 @@
 .piolibdeps
 .vscode
 lib/Config/Config.h
+examples/greensock/node_modules/
+examples/greensock/npm-debug.log
