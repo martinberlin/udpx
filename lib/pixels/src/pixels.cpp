@@ -36,7 +36,7 @@ void PIXELS::init(){
 
 bool PIXELS::receive(uint8_t *pyld, unsigned length){
     uint16_t pixCnt = 0;
-    pixel *pattern = marshal(pyld, length, &pixCnt);
+    pixel *pattern = unmarshal(pyld, length, &pixCnt);
     if(pixCnt==0){
         Serial.println("Returning from failed arshal");
         return false;
