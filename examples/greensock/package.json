@@ -1,0 +1,23 @@
+{
+  "name": "udpx-demo",
+  "version": "1.0.0",
+  "description": "Middleware to enable compression and http->udp transport",
+  "main": "middleware.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinberlin/udpx.git"
+  },
+  "keywords": [
+    "esp32",
+    "brotli"
+  ],
+  "author": "Fasani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/martinberlin/udpx/issues"
+  },
+  "homepage": "https://github.com/martinberlin/udpx#readme"
+}
