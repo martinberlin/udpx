@@ -1,0 +1,16 @@
+#box {
+   border: 1px solid black;
+   width: 388px;height: 100px;
+   margin-top: 5px;
+}
+
+#box_json {
+  margin-top: 15px;
+}
+
+#stripe {
+  width:100px;
+  height:100px;
+  position:relative;
+  background:#FF0000;
+}

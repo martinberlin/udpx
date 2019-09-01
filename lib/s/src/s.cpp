@@ -35,7 +35,10 @@ s::message s::parseMessage(uint8_t *pyld, uint16_t len){
         m.valid = false;
         return m;
     }
-    callback(&pyld[4], len-4);
+    m.pyld = &pyld[4];
+    m.len = len - 4;
+    m.valid = true;
+    return m;
 }
 
 

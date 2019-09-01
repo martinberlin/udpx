@@ -77,27 +77,6 @@ String IpAddress2String(const IPAddress& ipAddress)
   String(ipAddress[2]) + String(".") +\
   String(ipAddress[3]);
 }
-/**
- * if (error)
-        {
-          printMessage("After uncompressing json: ",false);printMessage(error.c_str());
-        } else { }
-
- Note this brTask is stripped to the bone to make it as fast as possible
- TODO: Research how to pass an array in notused Parameter (compressed data)
- */
-// Task sent to the core to decompress + push to Output
-void brTask(void * input){
-  AsyncUDPPacket *p = static_cast<AsyncUDPPacket*>(input);  
-  pix.receive(p->data(), p->length());
-
-  if (debugMode) {
-    Serial.println(" Heap: "+String(ESP.getFreeHeap())); 
-  }
-  vTaskDelete(NULL);
-  // https://www.freertos.org/implementing-a-FreeRTOS-task.html
-  // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
-}
 
 void WiFiEvent(WiFiEvent_t event) {
     Serial.printf("[WiFi-event] event: %d\n", event);
@@ -129,6 +108,7 @@ void WiFiEvent(WiFiEvent_t event) {
         Serial.println("micro seconds to consume");
         delay(0);
         }); 
+        
     } else {
       Serial.println("UDP Lister could not be started");
     }
