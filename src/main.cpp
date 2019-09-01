@@ -62,17 +62,6 @@ void printMessage(String message, bool newline = true)
    }
 }
 
-
-/**
- * Función principal donde se recibe el POST con la variable datos que contiene el JSON 
- */
-void serverInputPost() {
-  processedPosts++;
-  
-  printMessage("HEAP memory: "+String(ESP.getFreeHeap()));
-  //server.send(200, "application/json", "{\"status\":1, \"bytes\": " + String(strlen(datos))+"}");
-}
-
 void connectToWifi() {
   Serial.println("Connecting to Wi-Fi...");
   WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -96,12 +85,16 @@ void startWebserver() {
     [](AsyncWebServerRequest * request){},
     NULL,
     [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
- 
-      for (size_t i = 0; i < len; i++) {
-        Serial.write(data[i]);
+      // Send to pix class
+      pix.receive(data, len);
+      // Preview data
+      if (DEBUG_MODE) {
+        for (size_t i = 0; i < len; i++) {
+          Serial.print(data[i],HEX);Serial.print(' ');
+        }
       }
- 
-      Serial.println();
+      processedPosts++;
+      printMessage("HEAP:"+String(ESP.getFreeHeap())+" Job:"+String(processedPosts));
       request->send(200, "application/json", "{\"status\":1, \"bytes\": " + String(len)+"}");
   });
  

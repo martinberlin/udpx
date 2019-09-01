@@ -2,6 +2,7 @@ var stripe = $("div#stripe"),
     btn1 = $("button#btn1"),
     btn2 = $("button#btn2"),
     btn3 = $("button#btn3"),
+    http_mode = $("#http"),
     red = $("#r"), green = $("#g"), blue = $("#b"),
     stripe_length = $("#stripe_length"),
     output = $("#out"),
@@ -64,15 +65,30 @@ function convertPixel(x) {
   }
   
   if (displayHex !== lastPush) { 
-     $.ajax("http://127.0.0.1:1234?ip="+ ip.val() +"&c=0",
-      {
-      'data': bytesToPost, 
-      'type': 'POST',
-      async: false,
-      processData: false,
-      crossDomain: true,
-      contentType: false
-      }); 
+    isHttp = http_mode.is(":checked") ?1:0;
+    if (isHttp) {
+      // Send using TCP/IP directly to ESP32 IP
+      $.ajax("http://"+ ip.val() +"/post",
+        {
+        'data': bytesToPost, 
+        'type': 'POST',
+        async: false,
+        processData: false,
+        crossDomain: true,
+        contentType: false
+        }); 
+    } else {
+      // Send using UDP to middleware
+        $.ajax("http://127.0.0.1:1234?ip="+ ip.val() +"&c=0",
+        {
+        'data': bytesToPost, 
+        'type': 'POST',
+        async: false,
+        processData: false,
+        crossDomain: true,
+        contentType: false
+        });  
+    }
   }
   output.val(displayHex);
   lastPush = displayHex;

@@ -14,11 +14,16 @@
   <span style="background-color:red;color:white">·</span> R: <input id="r" type="number" max="255" maxlength="3" value="255" style="width: 3em"></input>
   <span style="background-color:green;color:white">·</span> G: <input id="g" type="number" max="255" maxlength="3" value="0" style="width: 3em"></input>
   <span style="background-color:blue;color:white">·</span> B: <input id="b" type="number" max="255" maxlength="3" value="0" style="width: 3em"></input>
+  Modo de envio: 
+  <input type="radio" name="mode" value="Http" id="http" checked>
+  <label for="http">HTTP</label>
+  <input type="radio" name="mode" value="Udp" id="udp">
+  <label for="udp">UDP</label>
 </div>
 <br>
 <button id="btn1">Start</button>
 <button id="btn2">Reverse</button>
-<button id="btn3" style="display: none">Test1</button>
+<button id="btn3" style="display: all">Test1</button>
 <label for="duration">Duration:</label>
 <input id="duration" type="number" max="10" maxlength="2" value="5" style="width: 2em">
 <label for="stripe_length">Stripe length:</label>
