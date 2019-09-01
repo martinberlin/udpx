@@ -12,7 +12,7 @@
 #include <Arduino.h>
 
 //#define RGBW //Removing the comment will enable RGBW instead of RGB
-
+// De obligatoria configuración. Si los piexels enviados son > PIXELCOUNT no mostrara nada.
 #define PIXELCOUNT 300
 #define PIXELPIN 19
 
