@@ -6,10 +6,14 @@
 #include <ArduinoJson.h>
 #include <pixels.h>
 #include <ESPmDNS.h>
+#include "ESPAsyncWebServer.h"
+
 extern "C" {
 	#include "freertos/FreeRTOS.h"
 	#include "freertos/timers.h"
 }
+
+AsyncWebServer server(SERVER_PORT);
 
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
@@ -26,16 +30,12 @@ bool debugMode = DEBUG_MODE;
 // Message transport protocol
 AsyncUDP udp;
 
-// Brotli decompression buffer
-uint8_t * compressed;
-TaskHandle_t brotliTask;
 size_t receivedLength;
 // Output class and Mqtt message buffer
 PIXELS pix;
 String payloadBuffer;
-// SPIFFS to read presentation
-File fsFile;
-String presentation;
+
+long processedPosts = 0;
 
 struct config {
   char title[140];
@@ -62,6 +62,17 @@ void printMessage(String message, bool newline = true)
    }
 }
 
+
+/**
+ * Función principal donde se recibe el POST con la variable datos que contiene el JSON 
+ */
+void serverInputPost() {
+  processedPosts++;
+  
+  printMessage("HEAP memory: "+String(ESP.getFreeHeap()));
+  //server.send(200, "application/json", "{\"status\":1, \"bytes\": " + String(strlen(datos))+"}");
+}
+
 void connectToWifi() {
   Serial.println("Connecting to Wi-Fi...");
   WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -78,6 +89,26 @@ String IpAddress2String(const IPAddress& ipAddress)
   String(ipAddress[3]);
 }
 
+void startWebserver() {
+  server.on(
+    "/post",
+    HTTP_POST,
+    [](AsyncWebServerRequest * request){},
+    NULL,
+    [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+ 
+      for (size_t i = 0; i < len; i++) {
+        Serial.write(data[i]);
+      }
+ 
+      Serial.println();
+      request->send(200, "application/json", "{\"status\":1, \"bytes\": " + String(len)+"}");
+  });
+ 
+  server.begin();
+  printMessage("WebServer started");
+}
+
 void WiFiEvent(WiFiEvent_t event) {
     Serial.printf("[WiFi-event] event: %d\n", event);
     switch(event) {
@@ -90,6 +121,8 @@ void WiFiEvent(WiFiEvent_t event) {
         }
         MDNS.addService("http", "tcp", 80);
         printMessage("p.local mDns started");
+        // Start httpServer
+        startWebserver();
 
       if(udp.listen(UDP_PORT)) {
         Serial.println("UDP Listening on IP: ");

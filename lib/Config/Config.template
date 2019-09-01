@@ -7,6 +7,8 @@
 // UDP Listener on port
 #define UDP_PORT 1234
 
+#define SERVER_PORT 80
+
 // Set a JSON valid and existing data/presentation-name.json
 #define FIRMWARE_PRESENTATION "/presentation.json"
 
