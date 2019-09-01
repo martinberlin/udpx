@@ -13,7 +13,7 @@
 
 //#define RGBW //Removing the comment will enable RGBW instead of RGB
 
-#define PIXELCOUNT 72
+#define PIXELCOUNT 300
 #define PIXELPIN 19
 
 #define USECRC false

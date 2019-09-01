@@ -31,15 +31,26 @@ function convertPixel(x) {
 
   var bytes = [];
   let off = [0,0,0];
+  let pixLength = stripe_length.val();
   rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
-  let bufferLen = (stripe_length.val()*3)+5;
+  let bufferLen = (pixLength*3)+5;
+
   // create an ArrayBuffer with a size in bytes
   var buffer = new ArrayBuffer(bufferLen);
   // Treat buffer as a view of 8-bit unsigned integer 
   var bytesToPost = new Uint8Array(buffer); 
   bi = 0;
+
+/*
+  Papa explanation of LSB & MSB
+   MSB = Int(Num Dec/256)
+   LSB = Num Dec -(MSB*256)
+ */
+  let MSB = parseInt(pixLength/256);
+  let LSB = pixLength - (MSB*256);
   // header bytes
-  hByte = [80,0,0,stripe_length.val(),0];
+  hByte = [80,0,0,LSB,MSB];
+  console.log(hByte);
   bytesToPost[bi] = hByte[0];bi++;  // p
   bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
   bytesToPost[bi] = hByte[2];bi++;  // unsigned 8-bit LED channel number
@@ -74,8 +85,8 @@ function convertPixel(x) {
         'type': 'POST',
         async: false,
         processData: false,
-        crossDomain: true,
-        contentType: false
+        contentType: false,
+        crossDomain: true
         }); 
     } else {
       // Send using UDP to middleware
