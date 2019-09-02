@@ -45,13 +45,6 @@ struct config {
   bool compression = true;
 } internalConfig;
 
-
-typedef struct {
-  unsigned size;
-  uint8_t *pyld;
-}taskParams;
-
-uint8_t *collect; 
 /**
  * Generic message printer. Modify this if you want to send this messages elsewhere (Display)
  */
@@ -83,7 +76,7 @@ String IpAddress2String(const IPAddress& ipAddress)
 }
 
 uint8_t *postBuffer;
-
+int chunk; 
 void startWebserver()
 {
 
@@ -93,23 +86,17 @@ void startWebserver()
       [](AsyncWebServerRequest *request) {},
       NULL,
       [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-        printMessage("Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));
-
         if (!index)
         {
           postBuffer = new uint8_t[POST_BUFFER];
+          chunk = 0;
           processedPosts++;
           start = millis();
-        }
-
-        if (DEBUG_MODE)
-        {
           printMessage("HEAP:" + String(ESP.getFreeHeap()) + " Job:" + String(processedPosts));
-          /* for (size_t i = 0; i < len; i++)
-          {
-            Serial.print(postBuffer[i], HEX); Serial.print(' ');
-          } */
         }
+        chunk++;
+        printMessage("Chunk:"+String(chunk)+" Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));
+        
         // Acumular el Post en un buffer ya que esta funcion se llama en chunks de alrededor 1K
         for (size_t i = 0; i < len; i++)
         {
