@@ -10,7 +10,14 @@
   width: 388px;height: 20px;
   margin-top: 5px;
 }
-
+#controlsbox {
+  border: 1px solid #CCC;
+  background-color: #222222;
+  color: rgb(255, 255, 255);
+  width: 388px;height: 34px;
+  margin-top:20px;
+  padding-top: 5px;padding-left:5px;
+}
 #box_json {
   margin-top: 15px;
 }
