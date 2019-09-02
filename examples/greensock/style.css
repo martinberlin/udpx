@@ -3,6 +3,13 @@
    width: 388px;height: 100px;
    margin-top: 5px;
 }
+#responsebox {
+  border: 1px solid black;
+  background-color: #222222;
+  color: rgb(255, 255, 255);
+  width: 388px;height: 20px;
+  margin-top: 5px;
+}
 
 #box_json {
   margin-top: 15px;

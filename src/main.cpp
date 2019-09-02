@@ -85,6 +85,7 @@ void startWebserver() {
     [](AsyncWebServerRequest * request){},
     NULL,
     [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+      long start = millis(); 
       // Send to pix class
       pix.receive(data, len);
       // Preview data
@@ -95,7 +96,11 @@ void startWebserver() {
       }
       processedPosts++;
       printMessage("HEAP:"+String(ESP.getFreeHeap())+" Job:"+String(processedPosts));
-      request->send(200, "application/json", "{\"status\":1, \"bytes\": " + String(len)+"}");
+      // Build response with CORs
+      AsyncWebServerResponse *response = request->beginResponse(200, "application/json", 
+      "{\"status\":1,\"bytes\": " + String(len)+",\"millis\": " + String(millis()-start)+"}");   
+      response->addHeader("Access-Control-Allow-Origin", "*");
+      request->send(response);
   });
  
   server.begin();
