@@ -14,6 +14,8 @@ extern "C" {
 }
 
 AsyncWebServer server(SERVER_PORT);
+// POST buffer
+#define POST_BUFFER 3000
 
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
@@ -25,6 +27,7 @@ char bssid[9];
 
 // Debug mode prints to serial
 bool debugMode = DEBUG_MODE;
+long start;
 // Turn on debug to enjoy seeing how ArduinoJson eats your heap memory
 
 // Message transport protocol
@@ -48,6 +51,7 @@ typedef struct {
   uint8_t *pyld;
 }taskParams;
 
+uint8_t *collect; 
 /**
  * Generic message printer. Modify this if you want to send this messages elsewhere (Display)
  */
@@ -78,31 +82,54 @@ String IpAddress2String(const IPAddress& ipAddress)
   String(ipAddress[3]);
 }
 
-void startWebserver() {
+uint8_t *postBuffer;
+
+void startWebserver()
+{
+
   server.on(
-    "/post",
-    HTTP_POST,
-    [](AsyncWebServerRequest * request){},
-    NULL,
-    [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-      long start = millis(); 
-      // Send to pix class
-      pix.receive(data, len);
-      // Preview data
-      if (DEBUG_MODE) {
-        for (size_t i = 0; i < len; i++) {
-          Serial.print(data[i],HEX);Serial.print(' ');
+      "/post",
+      HTTP_POST,
+      [](AsyncWebServerRequest *request) {},
+      NULL,
+      [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+        printMessage("Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));
+
+        if (!index)
+        {
+          postBuffer = new uint8_t[POST_BUFFER];
+          processedPosts++;
+          start = millis();
         }
-      }
-      processedPosts++;
-      printMessage("HEAP:"+String(ESP.getFreeHeap())+" Job:"+String(processedPosts));
-      // Build response with CORs
-      AsyncWebServerResponse *response = request->beginResponse(200, "application/json", 
-      "{\"status\":1,\"bytes\": " + String(len)+",\"millis\": " + String(millis()-start)+"}");   
-      response->addHeader("Access-Control-Allow-Origin", "*");
-      request->send(response);
-  });
- 
+
+        if (DEBUG_MODE)
+        {
+          printMessage("HEAP:" + String(ESP.getFreeHeap()) + " Job:" + String(processedPosts));
+          /* for (size_t i = 0; i < len; i++)
+          {
+            Serial.print(postBuffer[i], HEX); Serial.print(' ');
+          } */
+        }
+        // Acumular el Post en un buffer ya que esta funcion se llama en chunks de alrededor 1K
+        for (size_t i = 0; i < len; i++)
+        {
+          postBuffer[index + i] = data[i];
+        }
+
+        if (index + len == total)
+        {
+          // Send to pix class
+          pix.receive(postBuffer, total);
+          delete (postBuffer);
+          Serial.println();
+          // Build response with CORs
+          AsyncWebServerResponse *response = request->beginResponse(200, "application/json",
+                                                                    "{\"status\":1,\"bytes\": " + String(total) + ",\"millis\": " + String(millis() - start) + "}");
+          response->addHeader("Access-Control-Allow-Origin", "*");
+          request->send(response);
+        }
+      });
+
   server.begin();
   printMessage("WebServer started");
 }

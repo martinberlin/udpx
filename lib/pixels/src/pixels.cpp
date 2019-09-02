@@ -38,7 +38,8 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
     uint16_t pixCnt = 0;
     pixel *pattern = unmarshal(pyld, length, &pixCnt);
     if(pixCnt==0){
-        Serial.println("Returning from failed arshal");
+        Serial.println("Returning from failed marshal");
+        Serial.println("Received length: "+String(length));
         return false;
     }
     /*
@@ -82,7 +83,8 @@ void PIXELS::show(pixel *pixels, unsigned cnt){
 
 pixel *PIXELS::unmarshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt, uint8_t *channel){
     if(pyld[0]!=0x50){
-        Serial.println("Missing checkvalue");
+        Serial.println("Missing checkvalue, instead got: ");
+        Serial.print(pyld[0], HEX);
         // Set pixCnt to zero as we have not decoded any pixels and return NULL
         *pixCnt = 0;
         return NULL;
