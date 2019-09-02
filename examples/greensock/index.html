@@ -19,6 +19,8 @@
   <label for="http">HTTP</label>
   <input type="radio" name="mode" value="Udp" id="udp">
   <label for="udp">UDP</label>
+    &nbsp;&nbsp;&nbsp;<label for="esp32_ip"><b>ESP32 IP:</b></label>
+    <input id="esp32_ip" type="text" maxlength="15" value="192.168.1.72" style="width: 6em">
 </div>
 <br>
 <button id="btn1">Start</button>
@@ -27,9 +29,8 @@
 <label for="duration">Duration:</label>
 <input id="duration" type="number" max="10" maxlength="2" value="5" style="width: 2em">
 <label for="stripe_length">Stripe length:</label>
-<input id="stripe_length" type="number" max="10" maxlength="3" value="72" style="width: 3em">
-<label for="esp32_ip">ESP32 IP:</label>
-<input id="esp32_ip" type="text" maxlength="15" value="192.168.1.72" style="width: 6em">
+<input id="stripe_length" type="number" max="999" maxlength="3" value="72" style="width: 3em">
+
 
 <div id="controlsbox">Send 1 frame: 
 <button id="btnFirst">First</button>
