@@ -107,6 +107,12 @@ void startWebserver()
         {
           // Send to pix class
           pix.receive(postBuffer, total);
+          if (DEBUG_MODE) {
+          for (size_t i = 0; i < total;i++)
+          {
+            Serial.print(postBuffer[i], HEX); Serial.print(' ');
+          }
+          }
           delete (postBuffer);
           Serial.println();
           // Build response with CORs
