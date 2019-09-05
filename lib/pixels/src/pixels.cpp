@@ -42,17 +42,20 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
         Serial.println("Received length: "+String(length));
         return false;
     }
-    /*
+    
+    Serial.println();
     for(uint i=0; i<pixCnt; i++){
-        Serial.print("Got LED value RGB(");
+        if (pattern[i].R+pattern[i].B+pattern[i].G) {
+        Serial.print("LED index:"+String(i)+" RGB(");
         Serial.print(pattern[i].R);
         Serial.print(",");
         Serial.print(pattern[i].G);
         Serial.print(",");
         Serial.print(pattern[i].B);
         Serial.println(")");
+        }
     }
-    */
+    
     this->show(pattern, pixCnt);
     delete pattern;
     return true;
