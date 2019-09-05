@@ -24,7 +24,7 @@
 #ifndef pixels_h
 #define pixels_h
 #include <Arduino.h>
-
+// This does not work the way was originally planned set: const bool RGBW = true; in the class
 //#define RGBW //Removing the comment will enable RGBW instead of RGB
 
 #define PIXELCOUNT 144
@@ -44,7 +44,7 @@ typedef struct{
 class PIXELS
 {
     public:
-
+    const bool RGBW = true;
     PIXELS();
     
     void init();
@@ -69,10 +69,10 @@ class PIXELS
     uint8_t syncWord = 0x0;
 
     // We want to inform our lib if RGB or RGBW was selected
-    #ifdef RGBW
+    /* #ifdef RGBW
     const bool RGBW = true;
     #else
     const bool RGBW = false;
-    #endif
+    #endif */
 };
 #endif

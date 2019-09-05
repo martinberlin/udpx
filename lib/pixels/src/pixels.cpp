@@ -10,7 +10,7 @@
     // looked into putting it into class, we can if we use a different lib. This one is pretty inflexable
     // after compile time. But idc rn)
     #ifdef RGBW
-        NeoPixelBus<NeoRgbwFeature, NeoEsp32I2s1800KbpsMethod> strip(PIXELCOUNT, 19);
+        NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> strip(PIXELCOUNT, PIXELPIN);
     #else
         NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXELCOUNT, PIXELPIN);
     #endif
