@@ -59,7 +59,7 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
 
 void PIXELS::write(unsigned location, uint8_t R, uint8_t G, uint8_t B, uint8_t W){
     #ifdef RGBW
-    strip.setPixelColor(location, RgbwColor(R,G,B,W));
+    strip.SetPixelColor(location, RgbwColor(R,G,B,W));
     #else
     strip.SetPixelColor(location, RgbColor(R,G,B));
     #endif
@@ -72,7 +72,7 @@ void PIXELS::show(){
 void PIXELS::show(pixel *pixels, unsigned cnt){
     for(unsigned i = 0; i<cnt; i++){
         #ifdef RGBW
-        strip.setPixelColor(i, RgbwColor(pixels[i].R,pixels[i].G,pixels[i].B,pixels[i].W));
+        strip.SetPixelColor(i, RgbwColor(pixels[i].R,pixels[i].G,pixels[i].B,pixels[i].W));
         #else
         strip.SetPixelColor(i, RgbColor(pixels[i].R,pixels[i].G,pixels[i].B));
         #endif
