@@ -3,7 +3,6 @@
 #include <Config.h>
 #include <FS.h>
 #include "SPIFFS.h"
-#include <ArduinoJson.h>
 #include <pixels.h>
 #include <ESPmDNS.h>
 #include "ESPAsyncWebServer.h"
@@ -20,9 +19,6 @@ AsyncWebServer server(SERVER_PORT);
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
 String lastWill;
-// Note DynamicJsonDocument should be created once otherwise eats your HEAP memory like cookies
-const size_t capacity = 144 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(144);
-DynamicJsonDocument doc(capacity);
 char bssid[9];
 
 // Debug mode prints to serial
