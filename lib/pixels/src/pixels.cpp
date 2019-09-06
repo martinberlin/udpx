@@ -10,7 +10,7 @@
     // looked into putting it into class, we can if we use a different lib. This one is pretty inflexable
     // after compile time. But idc rn)
     #ifdef RGBW
-        NeoPixelBus<NeoRgbwFeature, NeoEsp32I2s1800KbpsMethod> strip(PIXELCOUNT, 19);
+        NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> strip(PIXELCOUNT, PIXELPIN);
     #else
         NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXELCOUNT, PIXELPIN);
     #endif
@@ -36,7 +36,7 @@ void PIXELS::init(){
 
 bool PIXELS::receive(uint8_t *pyld, unsigned length){
     uint16_t pixCnt = 0;
-    pixel *pattern = marshal(pyld, length, &pixCnt);
+    pixel *pattern = unmarshal(pyld, length, &pixCnt);
     if(pixCnt==0){
         Serial.println("Returning from failed arshal");
         return false;
@@ -80,7 +80,7 @@ void PIXELS::show(pixel *pixels, unsigned cnt){
     strip.Show();
 }
 
-pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
+pixel *PIXELS::unmarshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt, uint8_t *channel){
     if(pyld[0]!=0x50){
         Serial.println("Missing checkvalue");
         // Set pixCnt to zero as we have not decoded any pixels and return NULL
@@ -91,19 +91,18 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
     //    *pixCnt = 0;
     //    return NULL;
     //} TODO UNCOMMENT REMOVED FOR EASY NETCAT USAGE QUICKLY
+    if(channel!=NULL){
+        *channel = pyld[2];
+    }
     // Decode number of pixels, we don't have to send the entire strip if we don't want to
-    uint16_t cnt = pyld[2] | pyld[3]<<8;
-    Serial.print("[ DEUG ] From marshal - ");
-    Serial.println(cnt);
+    uint16_t cnt = pyld[3] | pyld[4]<<8;
     if(cnt>PIXELCOUNT){
-        Serial.println("Invlid cnt");
         // We got more pixels than the strip allows
         *pixCnt = 0;
         return NULL;
     }
     if (cnt ==0)
     {
-        Serial.println("COUNT IS ZERO!!!");
         return false;
     }
     pixel *result = new pixel[cnt];
@@ -115,9 +114,9 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
         result[i].B = pyld[4+(i*4)+2];
         result[i].W = pyld[4+(i*4)+3];
         #else
-        result[i].R = pyld[4+(i*3)];
-        result[i].G = pyld[4+(i*3)+1];
-        result[i].B = pyld[4+(i*3)+2];
+        result[i].R = pyld[5+(i*3)];
+        result[i].G = pyld[5+(i*3)+1];
+        result[i].B = pyld[5+(i*3)+2];
         #endif
     }
 
