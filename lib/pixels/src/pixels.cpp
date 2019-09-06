@@ -113,7 +113,7 @@ pixel *PIXELS::marshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt){
         result[i].R = pyld[4+(i*4)];
         result[i].G = pyld[4+(i*4)+1];
         result[i].B = pyld[4+(i*4)+2];
-        result[i].W = pyld[4+(i*4)+3]
+        result[i].W = pyld[4+(i*4)+3];
         #else
         result[i].R = pyld[4+(i*3)];
         result[i].G = pyld[4+(i*3)+1];

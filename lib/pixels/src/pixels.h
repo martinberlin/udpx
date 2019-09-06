@@ -25,7 +25,7 @@
 #define pixels_h
 #include <Arduino.h>
 
-//#define RGBW //Removing the comment will enable RGBW instead of RGB
+#define RGBW //Removing the comment will enable RGBW instead of RGB
 
 #define PIXELCOUNT 144
 #define PIXELPIN 19
@@ -70,9 +70,9 @@ class PIXELS
 
     // We want to inform our lib if RGB or RGBW was selected
     #ifdef RGBW
-    const bool RGBW = true;
+    const bool RGBWE = true;
     #else
-    const bool RGBW = false;
+    const bool RGBWE = false;
     #endif
 };
 #endif
