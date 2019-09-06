@@ -24,7 +24,6 @@
 #ifndef pixels_h
 #define pixels_h
 #include <Arduino.h>
-// This does not work the way was originally planned set: const bool RGBW = true; in the class
 #define RGBW //Removing the comment will enable RGBW instead of RGB
 
 #define PIXELCOUNT 144
