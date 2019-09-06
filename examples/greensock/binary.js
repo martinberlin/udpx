@@ -136,12 +136,11 @@ function sendToEsp(bytesToPost) {
         contentType: false,
         crossDomain: true,
         success: function (response) {
-          console.log(response);
           $('#bytes').text("Bytes rec: "+response.bytes);
           $('#millis').text("Millis: "+response.millis);
         },
         error: function (error) {
-            console.log(error)
+            //console.log(error)
         }
       }); 
     } else {
