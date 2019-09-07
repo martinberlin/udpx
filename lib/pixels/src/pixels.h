@@ -24,7 +24,7 @@
 #ifndef pixels_h
 #define pixels_h
 #include <Arduino.h>
-//#define RGBW //Removing the comment will enable RGBW instead of RGB
+#define RGBW //Removing the comment will enable RGBW instead of RGB
 
 #define PIXELCOUNT 144
 #define PIXELPIN 19

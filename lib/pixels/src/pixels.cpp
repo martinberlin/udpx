@@ -109,10 +109,10 @@ pixel *PIXELS::unmarshal(uint8_t *pyld, unsigned len, uint16_t *pixCnt, uint8_t 
     // TODO Add logic to return if len is impossibly large or small
     for(uint16_t i = 0; i<cnt; i++){
         #ifdef RGBW
-        result[i].R = pyld[4+(i*4)];
-        result[i].G = pyld[4+(i*4)+1];
-        result[i].B = pyld[4+(i*4)+2];
-        result[i].W = pyld[4+(i*4)+3];
+        result[i].R = pyld[5+(i*4)];
+        result[i].G = pyld[5+(i*4)+1];
+        result[i].B = pyld[5+(i*4)+2];
+        result[i].W = pyld[5+(i*4)+3];
         #else
         result[i].R = pyld[5+(i*3)];
         result[i].G = pyld[5+(i*3)+1];
