@@ -78,7 +78,7 @@ This line will enable RGBW mode sending 4 bytes per pixel. Comment to use a RGB 
 
 **2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster
 
-**2019-09** Tests and fixes to achiebe a stable RGB, RGBW version
+**2019-09** Tests and fixes to achieve a stable RGB, RGBW version
 
 #### Old command line test
 

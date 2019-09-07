@@ -178,9 +178,9 @@ void WiFiEvent(WiFiEvent_t event) {
         printMessage(String(packet.length()), false);
         unsigned long t = micros();
         pix.receive(packet.data(), packet.length());
-        Serial.print("Took ");
+        Serial.print(" Took ");
         Serial.print(micros()-t);
-        Serial.println("micro seconds to consume");
+        Serial.println(" micro seconds to consume");
         delay(0);
         }); 
     } else {
