@@ -14,7 +14,7 @@ extern "C" {
 
 AsyncWebServer server(SERVER_PORT);
 // POST buffer
-#define POST_BUFFER 3000
+#define POST_BUFFER 4000
 
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
@@ -82,8 +82,7 @@ void startWebserver()
       [](AsyncWebServerRequest *request) {},
       NULL,
       [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-        if (!index)
-        {
+        if (!index){
           postBuffer = new uint8_t[POST_BUFFER];
           chunk = 0;
           processedPosts++;
@@ -91,31 +90,23 @@ void startWebserver()
           printMessage("HEAP:" + String(ESP.getFreeHeap()) + " Job:" + String(processedPosts));
         }
         chunk++;
-        printMessage("Chunk:"+String(chunk)+" Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));
-        
+        printMessage("Chunk:"+String(chunk)+" Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));       
         // Acumular el Post en un buffer ya que esta funcion se llama en chunks de alrededor 1K
         for (size_t i = 0; i < len; i++)
         {
           postBuffer[index + i] = data[i];
         }
-
         if (index + len == total)
         {
           // Send to pix class
           pix.receive(postBuffer, total);
-          if (DEBUG_MODE) {
-          for (size_t i = 0; i < total;i++)
-          {
-            Serial.print(postBuffer[i], HEX); Serial.print(' ');
-          }
-          }
           delete (postBuffer);
-          Serial.println();
-          // Build response with CORs
+          
+          /*
           AsyncWebServerResponse *response = request->beginResponse(200, "application/json",
-                                                                    "{\"status\":1,\"bytes\": " + String(total) + ",\"millis\": " + String(millis() - start) + "}");
+                "{\"status\":1,\"bytes\": " + String(total) + ",\"millis\": " + String(millis() - start) + "}");
           response->addHeader("Access-Control-Allow-Origin", "*");
-          request->send(response);
+          request->send(response); */
         }
       });
 

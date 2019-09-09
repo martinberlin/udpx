@@ -43,7 +43,7 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
         return false;
     }
     
-    Serial.println();
+    /*
     for(uint i=0; i<pixCnt; i++){
         if (pattern[i].R+pattern[i].B+pattern[i].G) {
         Serial.print("LED index:"+String(i)+" RGB(");
@@ -54,7 +54,7 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
         Serial.print(pattern[i].B);
         Serial.println(")");
         }
-    }
+    } */
     
     this->show(pattern, pixCnt);
     delete pattern;

@@ -131,7 +131,7 @@ function sendToEsp(bytesToPost) {
         {
         'data': bytesToPost, 
         'type': 'POST',
-        async: false,
+        async: true,
         processData: false,
         contentType: false,
         crossDomain: true,
