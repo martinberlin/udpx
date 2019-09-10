@@ -26,18 +26,15 @@ Please DO NOT merge in any stable branch before the tests pass. Keeping this met
 
 ## Branching model
 
-Please adhere to following branching model when working in this repository. Not strictly, just to mantein a certain order and avoid loosing time. 
+Please adhere to following branching model when working in this repository. Not strictly, just to maintain a certain order and avoid loosing time. 
 
     master  → Main stable branch (clean/no debugging)
       ↑↓
     develop → Where features are merged only *after testing* (serial debug is ok)
       ↓
     feature/1 → Merged back in develop *only* after testing 
-    bug/1     → Merged back in develop (Same methodology)
-
-    martin/myproject → Is no problem, but after some time let's
-    hendrik/hisproject → fork it into your own project
-    samuel/project 
+    bug/1     → Merged back in develop
+    
 
     Please except of PIXELS+s no stale branches unless there is a real need to have them. 
 
