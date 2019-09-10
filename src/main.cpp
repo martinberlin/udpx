@@ -16,23 +16,19 @@ AsyncWebServer server(SERVER_PORT);
 // POST buffer
 #define POST_BUFFER 4000
 
-TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
-String lastWill;
+
 char bssid[9];
 
 // Debug mode prints to serial
 bool debugMode = DEBUG_MODE;
 long start;
-// Turn on debug to enjoy seeing how ArduinoJson eats your heap memory
-
 // Message transport protocol
 AsyncUDP udp;
 
 size_t receivedLength;
-// Output class and Mqtt message buffer
+// Output class receives binary and outputs to Neopixel
 PIXELS pix;
-String payloadBuffer;
 
 long processedPosts = 0;
 
@@ -153,8 +149,7 @@ void WiFiEvent(WiFiEvent_t event) {
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         Serial.println("WiFi lost connection");
-        // Ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
-        xTimerStop(mqttReconnectTimer, 0);
+
 	    	xTimerStart(wifiReconnectTimer, 0);
         break;
         // Non used, just there to avoid warnings
