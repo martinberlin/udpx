@@ -13,7 +13,7 @@
 
 //#define RGBW //Removing the comment will enable RGBW instead of RGB
 // De obligatoria configuración. Si los piexels enviados son > PIXELCOUNT no mostrara nada.
-#define PIXELCOUNT 600
+#define PIXELCOUNT 700
 #define PIXELPIN 19
 
 #define USECRC false

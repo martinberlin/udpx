@@ -131,13 +131,13 @@ function sendToEsp(bytesToPost) {
         {
         'data': bytesToPost, 
         'type': 'POST',
-        async: true,
+        async: false,
         processData: false,
         contentType: false,
         crossDomain: true,
         success: function (response) {
-          $('#bytes').text("Bytes rec: "+response.bytes);
-          $('#millis').text("Millis: "+response.millis);
+          $('#bytes').text("Bytes rec: "+response.b);
+          $('#millis').text("Millis: "+response.m);
         },
         error: function (error) {
             //console.log(error)

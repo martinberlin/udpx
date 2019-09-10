@@ -86,7 +86,7 @@ void startWebserver()
           printMessage("HEAP:" + String(ESP.getFreeHeap()) + " Job:" + String(processedPosts));
         }
         chunk++;
-        printMessage("Chunk:"+String(chunk)+" Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));       
+        Serial.println("Chunk:"+String(chunk)+" Len:" + String(len) + " Index:" + String(index) + " Total:" + String(total));       
         // Acumular el Post en un buffer ya que esta funcion se llama en chunks de alrededor 1K
         for (size_t i = 0; i < len; i++)
         {
@@ -98,11 +98,10 @@ void startWebserver()
           pix.receive(postBuffer, total);
           delete (postBuffer);
           
-          /*
           AsyncWebServerResponse *response = request->beginResponse(200, "application/json",
-                "{\"status\":1,\"bytes\": " + String(total) + ",\"millis\": " + String(millis() - start) + "}");
+                "{\"b\": " + String(total) + ",\"m\": " + String(millis() - start) + "}");
           response->addHeader("Access-Control-Allow-Origin", "*");
-          request->send(response); */
+          request->send(response);
         }
       });
 
