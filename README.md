@@ -3,8 +3,9 @@
 **udpx is a compression technology to transport data.**
 
 This technology will be used in a future project in partnership with Hendrik Putzek but can be individually tested as mean to transport compressed data between devices.
-We are using [Brotli](http://manpages.ubuntu.com/manpages/bionic/man1/brotli.1.html) as a compression algorithm to transport data between frontend (nodejs) and the firmware (esp32)
-This library represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
+
+This repository represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
+[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will a DMX like architecture to control LEDS
 
 ### License
 
@@ -45,6 +46,8 @@ The data pin of the addressable leds:
 
 ### History
 
-**2019-06** Started working with Front-end developer [Hendrik Putzek](https://twitter.com/hputzek) to develop a firmware solution to transport a lot of frames per seconds from his Nodejs backend to a Led controller
+**2019-06** Started working with Front-end developer [Hendrik Putzek](https://twitter.com/hputzek) to develop a firmware solution to transport a lot of frames per seconds from his Nodejs backend to a Led controller. first version used JSON and  [Brotli](http://manpages.ubuntu.com/manpages/bionic/man1/brotli.1.html) as a compression algorithm to transport data between frontend (nodejs) and the firmware (esp32)
+
 **2019-07** Decided to name the Firmware UDPX and make it open-source to let another developers join forces and use it for their own needs
-**2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster
+
+**2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster. The new protocol recives bytes instead of JSON and it lives in develop branch
