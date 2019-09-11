@@ -7,7 +7,9 @@ This repository represents the Firmware part and it should be compiled using Pla
 
 TEAM
 Hendrik Putzek   - Front end / Nodejs, VUE
+
 Samuel Archibald - C++ / GO Api backend
+
 Martin Fasani    - Firmware and testing
 
 ### License
