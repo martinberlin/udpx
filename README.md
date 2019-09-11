@@ -2,10 +2,13 @@
 
 **udpx is a compression technology to transport data.**
 
-This technology will be used in a future project in partnership with Hendrik Putzek but can be individually tested as mean to transport compressed data between devices.
-
 This repository represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
-[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will be a DMX like architecture to control LEDS
+[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS
+
+TEAM
+Hendrik Putzek   - Front end / Nodejs, VUE
+Samuel Archibald - C++ / GO Api backend
+Martin Fasani    - Firmware and testing
 
 ### License
 
