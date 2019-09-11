@@ -5,7 +5,7 @@
 This technology will be used in a future project in partnership with Hendrik Putzek but can be individually tested as mean to transport compressed data between devices.
 
 This repository represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
-[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will a DMX like architecture to control LEDS
+[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will be a DMX like architecture to control LEDS
 
 ### License
 
@@ -50,4 +50,4 @@ The data pin of the addressable leds:
 
 **2019-07** Decided to name the Firmware UDPX and make it open-source to let another developers join forces and use it for their own needs
 
-**2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster. The new protocol recives bytes instead of JSON and it lives in develop branch
+**2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster. The new protocol receives bytes instead of JSON and it lives in develop branch
