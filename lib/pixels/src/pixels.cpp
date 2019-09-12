@@ -38,8 +38,9 @@ bool PIXELS::receive(uint8_t *pyld, unsigned length){
     uint16_t pixCnt = 0;
     pixel *pattern = unmarshal(pyld, length, &pixCnt);
     if(pixCnt==0){
-        Serial.println("Returning from failed arshal");
-        return false;
+        strip.Show();
+        Serial.println("Clearing strand");
+        return true;
     }
     /*
     for(uint i=0; i<pixCnt; i++){

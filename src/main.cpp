@@ -175,7 +175,7 @@ void WiFiEvent(WiFiEvent_t event) {
     udp.onPacket([](AsyncUDPPacket packet) {
         //printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
         printMessage("Len: ", false);
-        printMessage(String(packet.length()), false);
+        printMessage(String(packet.length()), true);
         unsigned long t = micros();
         pix.receive(packet.data(), packet.length());
         Serial.print(" Took ");
@@ -291,7 +291,7 @@ void setup()
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
   connectToWifi();
-
+  pix.init();
   WiFi.onEvent(WiFiEvent);
   // TODO: Update this with new define STATUS_TOPIC
   lastWill = "pixelcrasher/online-status/"+String(bssid);
@@ -308,7 +308,7 @@ void setup()
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
   // Pixels output
-  pix.init();
+  
 }
 
 void loop() {
