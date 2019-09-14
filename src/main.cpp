@@ -5,6 +5,7 @@
 #include "SPIFFS.h"
 #include <ArduinoJson.h>
 #include <pixels.h>
+#include <s.h>
 extern "C" {
 	#include "freertos/FreeRTOS.h"
 	#include "freertos/timers.h"
@@ -19,6 +20,7 @@ String lastWill;
 const size_t capacity = 144 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(144);
 DynamicJsonDocument doc(capacity);
 char bssid[9];
+s stream();
 
 // Debug mode prints to serial
 bool debugMode = DEBUG_MODE;
