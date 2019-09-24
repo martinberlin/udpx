@@ -8,7 +8,7 @@ This library represents the Firmware part and it should be compiled using Platfo
 
 ### Branch feature/tcp
 
-This branch is running the actual Pixels binary version and supports both TCP and UDP. TCP is not the ideal way to send anymations since it has a lot of overhead but the good part of it is that using the great [ESPAsyncWebServer]https://github.com/me-no-dev/ESPAsyncWebServer) it will buffer http post request, enabling you to surpass ESP32 max. transport unit (MTU) and being able to send to a very large stripe of Pixels (Tested with 999 RGBs, about 3Kb of data)
+This branch is running the actual Pixels binary version and supports both TCP and UDP. TCP is not the ideal way to send anymations since it has a lot of overhead but the good part of it is that using the great [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) it will buffer http post request, enabling you to surpass ESP32 max. transport unit (MTU) and being able to send to a very large stripe of Pixels (Tested with 999 RGBs, about 3Kb of data)
 Note that as larger it gets, as slower it will be, since there is no ticky without micky. 
 
 This is testeable sending from linux bash UDP messages using Netcat or also both TCP/UDP using your browser with [/examples/test](https://github.com/martinberlin/udpx/tree/feature/tcp/examples/test):
