@@ -3,6 +3,6 @@
 .piolibdeps
 .vscode
 lib/Config/Config.h
-examples/greensock/node_modules/
-examples/greensock/package-lock.json
-examples/greensock/npm-debug.log
+examples/test/node_modules/
+examples/test/package-lock.json
+examples/test/npm-debug.log

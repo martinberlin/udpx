@@ -6,9 +6,12 @@ This technology will be used in a future project in partnership with Hendrik Put
 We are using [Brotli](http://manpages.ubuntu.com/manpages/bionic/man1/brotli.1.html) as a compression algorithm to transport data between frontend (nodejs) and the firmware (esp32)
 This library represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
 
-### Branch feature/examples
+### Branch feature/tcp
 
-This branch is running the actual Pixels binary version and it's where we will create the examples section. Tools where we can measure speed, send different patterns and animations via UDP to the ESP32 Controller. Is testeable sending from linux bash:
+This branch is running the actual Pixels binary version and supports both TCP and UDP. TCP is not the ideal way to send anymations since it has a lot of overhead but the good part of it is that using the great [ESPAsyncWebServer]https://github.com/me-no-dev/ESPAsyncWebServer) it will buffer http post request, enabling you to surpass ESP32 max. transport unit (MTU) and being able to send to a very large stripe of Pixels (Tested with 999 RGBs, about 3Kb of data)
+Note that as larger it gets, as slower it will be, since there is no ticky without micky. 
+
+This is testeable sending from linux bash UDP messages using Netcat or also both TCP/UDP using your browser with [/examples/test](https://github.com/martinberlin/udpx/tree/feature/tcp/examples/test):
 
 cat examples/72-on.bin|nc -w1 -u 192.168.0.ESP32_IP 1234
 
@@ -16,7 +19,7 @@ cat examples/72-of.bin|nc -w1 -u 192.168.0.ESP32_IP 1234
 
 This should send 72 pixels (Note that not all are on)
 To understand the binary please read [the pixels section](https://github.com/martinberlin/udpx/tree/PIXELS%2Bs/lib/pixels)
-
+Note that due to javascript restrictions to test UDP you need to start a middleware.js with nodejs that redirects the TCP packages to UDP. Check the readme in /examples/test to see how to do that.
 
 ### License
 
