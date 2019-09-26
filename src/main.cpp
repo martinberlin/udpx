@@ -307,8 +307,6 @@ void setup()
   mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-  // Pixels output
-  pix.init();
 }
 
 void loop() {
