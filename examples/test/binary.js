@@ -51,11 +51,11 @@ function convertPixel(x) {
   var buffer = new ArrayBuffer(bufferLen);
   var bytesToPost = new Uint8Array(buffer); 
   bi = 0;
-
+  let Ch = 1;
   let MSB = parseInt(pixLength/256);
   let LSB = pixLength - (MSB*256);
   // header bytes - Todo: Add this in his own function
-  hByte = [80,1,0,LSB,MSB];
+  hByte = [80,0,Ch,LSB,MSB];
   //console.log(hByte); // Debug headers
   bytesToPost[bi] = hByte[0];bi++;  // p
   bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
@@ -110,7 +110,7 @@ function xPixel(x) {
   let MSB = parseInt(pixLength/256);
   let LSB = pixLength - (MSB*256);
   // header bytes
-  hByte = [80,0,0,LSB,MSB];
+  hByte = [80,0,1,LSB,MSB];
   
   // create an ArrayBuffer with a size in bytes
   var buffer = new ArrayBuffer(bufferLen);
@@ -123,6 +123,8 @@ function xPixel(x) {
   bytesToPost[bi] = hByte[3];bi++;  // count(pixels) 16 bit, next too
   bytesToPost[bi] = hByte[4];bi++;  // Second part of count(pixels) not used here for now
   displayHex += toHexString(hByte); // Start the preview in HEX with headers
+  console.log(hByte);
+
 
   for (var k = 1; k <= parseInt(pixLength); k++) {
     if (x === k) {
