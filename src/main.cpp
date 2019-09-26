@@ -180,9 +180,13 @@ void WiFiEvent(WiFiEvent_t event) {
         printMessage(String(packet.length()), false);
         unsigned long t = micros();
         pix.receive(packet.data(), packet.length());
-        Serial.print(" Took ");
-        Serial.print(micros()-t);
-        Serial.println(" micro seconds to consume");
+        Serial.println();
+        for (size_t i = 0; i < 8; i++)
+        {
+          Serial.print(packet.data()[i], HEX);
+          Serial.print(" ");
+        }
+
         delay(0);
         }); 
     } else {
