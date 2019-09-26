@@ -110,6 +110,8 @@ void WiFiEvent(WiFiEvent_t event) {
     case SYSTEM_EVENT_STA_GOT_IP:
       Serial.println("WiFi connected: ");Serial.println(WiFi.localIP());
 
+      pix.addChannel(19, 72, 1);
+
       // Read presentation template from FS json only if MQTT_ENABLE is true
       if (MQTT_ENABLE) {
       if (SPIFFS.begin())

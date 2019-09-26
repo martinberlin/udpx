@@ -55,7 +55,7 @@ function convertPixel(x) {
   let MSB = parseInt(pixLength/256);
   let LSB = pixLength - (MSB*256);
   // header bytes - Todo: Add this in his own function
-  hByte = [80,0,0,LSB,MSB];
+  hByte = [80,1,0,LSB,MSB];
   //console.log(hByte); // Debug headers
   bytesToPost[bi] = hByte[0];bi++;  // p
   bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
