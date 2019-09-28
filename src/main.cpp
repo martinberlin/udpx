@@ -1,11 +1,11 @@
 #include <WiFi.h>
 #include "AsyncUDP.h"
-#include "brotli/decode.h"
 #include <Config.h>
 #include <FS.h>
 #include "SPIFFS.h"
 #include <ArduinoJson.h>
-#include <Output.h>
+#include <pixels.h>
+#include <s.h>
 extern "C" {
 	#include "freertos/FreeRTOS.h"
 	#include "freertos/timers.h"
@@ -20,6 +20,7 @@ String lastWill;
 const size_t capacity = 144 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(144);
 DynamicJsonDocument doc(capacity);
 char bssid[9];
+s stream();
 
 // Debug mode prints to serial
 bool debugMode = DEBUG_MODE;
@@ -29,13 +30,11 @@ bool debugMode = DEBUG_MODE;
 AsyncUDP udp;
 
 // Brotli decompression buffer
-#define BROTLI_DECOMPRESSION_BUFFER 3000
-//uint8_t * compressed;
+uint8_t * compressed;
 TaskHandle_t brotliTask;
 size_t receivedLength;
-BrotliDecoderResult brotli;
 // Output class and Mqtt message buffer
-Output output;
+PIXELS pix;
 String payloadBuffer;
 // SPIFFS to read presentation
 File fsFile;
@@ -46,6 +45,11 @@ struct config {
   bool compression = true;
 } internalConfig;
 
+
+typedef struct {
+  unsigned size;
+  uint8_t *pyld;
+}taskParams;
 
 /**
  * Generic message printer. Modify this if you want to send this messages elsewhere (Display)
@@ -90,30 +94,16 @@ String IpAddress2String(const IPAddress& ipAddress)
  TODO: Research how to pass an array in notused Parameter (compressed data)
  */
 // Task sent to the core to decompress + push to Output
-void brTask(void * compressed){  
-    uint8_t *brOutBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
-    if (debugMode) Serial.println(" Heap: "+String(ESP.getFreeHeap()));
-    size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
+void brTask(void * input){
+  AsyncUDPPacket *p = static_cast<AsyncUDPPacket*>(input);  
+  pix.receive(p->data(), p->length());
 
-    brotli = BrotliDecoderDecompress(
-      receivedLength,
-      (const uint8_t *)compressed,
-      &bufferLength,
-      brOutBuffer);
-      delete compressed;
-
-      if (brotli == 1) {
-        // Deserialize the uncompressed JSON (strip error handling)
-        deserializeJson(doc, brOutBuffer);
-        JsonArray pixels = doc.as<JsonArray>();
-        output.setPixels(&pixels);
-	delete brOutBuffer;
-        //free(brOutBuffer); // Causing corrupted heap?
-      }
-      
-      vTaskDelete(NULL);
-      // https://www.freertos.org/implementing-a-FreeRTOS-task.html
-      // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
+  if (debugMode) {
+    Serial.println(" Heap: "+String(ESP.getFreeHeap())); 
+  }
+  vTaskDelete(NULL);
+  // https://www.freertos.org/implementing-a-FreeRTOS-task.html
+  // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
 }
 
 void WiFiEvent(WiFiEvent_t event) {
@@ -187,34 +177,13 @@ void WiFiEvent(WiFiEvent_t event) {
     udp.onPacket([](AsyncUDPPacket packet) {
         //printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
         printMessage("Len: ", false);
-        printMessage(String(packet.length()), false);
-        /* printMessage(" Data: ",false);
-        if (debugMode) {
-          Serial.write(packet.data(), packet.length());
-        } */
-        
-        // Save compressed in memory instead of simply: uint8_t compressed[compressedBytes.size()];
-        receivedLength = packet.length();
-
-        uint8_t *compressed  = new uint8_t[receivedLength];
-        
-        for ( int i = 0; i < packet.length(); i++ ) {
-            uint8_t conv = (int) packet.data()[i];
-            compressed[i] = conv;
-            //Serial.print(conv);Serial.print(",");
-        }
-
-          xTaskCreatePinnedToCore(
-                    brTask,        /* Task function. */
-                    "uncompress",  /* name of task. */
-                    20000,         /* Stack size of task */
-                    compressed,          /* parameter of the task */
-                    9,             /* priority of the task */
-                    &brotliTask,   /* Task handle to keep track of created task */
-                    0);            /* pin task to core 1 */
-        //reply to the client (We don't need to ACK now)
-        //packet.printf("1");
-        delay(10);
+        printMessage(String(packet.length()), true);
+        unsigned long t = micros();
+        pix.receive(packet.data(), packet.length());
+        Serial.print(" Took ");
+        Serial.print(micros()-t);
+        Serial.println(" micro seconds to consume");
+        delay(0);
         }); 
     } else {
       Serial.println("UDP Lister could not be started");
@@ -324,7 +293,7 @@ void setup()
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
   connectToWifi();
-
+  pix.init();
   WiFi.onEvent(WiFiEvent);
   // TODO: Update this with new define STATUS_TOPIC
   lastWill = "pixelcrasher/online-status/"+String(bssid);
@@ -341,7 +310,7 @@ void setup()
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
   // Pixels output
-  output.setup();
+  
 }
 
 void loop() {
