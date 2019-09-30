@@ -1,25 +1,25 @@
-#box {
-   border: 1px solid black;
-   width: 388px;height: 100px;
-   margin-top: 5px;
+body {
+  font-family: Helvetica, sans-serif;
+  box-sizing: border-box;
 }
-#responsebox {
-  border: 1px solid black;
-  background-color: #222222;
-  color: rgb(255, 255, 255);
-  width: 388px;height: 20px;
-  margin-top: 5px;
+
+form {
+  display: flex;
+  flex-wrap: wrap;
 }
-#controlsbox {
-  border: 1px solid #CCC;
-  background-color: #222222;
-  color: rgb(255, 255, 255);
-  width: 388px;height: 34px;
-  margin-top:20px;
-  padding-top: 5px;padding-left:5px;
+
+fieldset {
+  min-width: 360px;
+  width: 50%;
+  margin: 0 10px;
 }
-#box_json {
-  margin-top: 15px;
+
+textarea {
+  font-family: monospace;
+}
+
+input, button, textarea {
+  margin-bottom: 10px;
 }
 
 #stripe {
@@ -29,11 +29,30 @@
   background:#FF0000;
 }
 
-.nowhite {
-  border: solid 1px #ffffff; 
-  background-color:black;color:white;
+#r {
+  background-color: #ff000029;
 }
-.rgbw {
-  border: solid 1px #074405;  
-  background-color:white;color:black;
+
+#g {
+  background-color: #00ff0821;
+}
+
+#b {
+  background-color: #0400ff21;
+}
+
+#w {
+  background-color: #efefef;
+}
+
+.stripe-box {
+  padding: 2px;
+  background: #dddd;
+  box-shadow: 0px 0px 7px inset rgba(0,0,0,0.4);
+  border-radius: 2px;
+  margin: 20px;
+}
+
+.fullwidth {
+  width: 100%;
 }
