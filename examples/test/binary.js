@@ -16,6 +16,8 @@ var stripe = $("div#stripe"),
     ip = $("#esp32_ip"),
     compression = $("#compression"),
     delay = $("#duration"),
+    colorInvert = $("#color_invert"),
+    colorRandom = $("#color_random"),
     iX = 0;
 
 tl1 = TweenMax.to(stripe, delay.val(), {
@@ -41,13 +43,7 @@ function convertPixel(x) {
     isRgbW = rgbw.is(":checked") ? 1 : 0;
 
     let off = [0, 0, 0];
-    rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
     let bufferLen = (pixLength * 3) + 5;
-    if (isRgbW) {
-        rgb.push(parseInt(white.val()));
-        off.push(0);
-        bufferLen = (pixLength * 4) + 5;
-    }
 
     // create an ArrayBuffer with a size in bytes
     var buffer = new ArrayBuffer(bufferLen);
@@ -72,40 +68,55 @@ function convertPixel(x) {
     displayHex += toHexString(hByte); // Start the preview in HEX with headers
 
     for (var k = 1; k <= parseInt(stripe_length.val()); k++) {
+      isInverted = colorInvert.is(":checked") ? 1 : 0;
+      isRandom = colorRandom.is(":checked") ? 1 : 0;
+      let rC = (isRandom) ? Math.floor(Math.random() * 255)  : parseInt(red.val());
+      let gC = (isRandom) ? Math.floor(Math.random() * 255)  : parseInt(green.val());
+      let bC = (isRandom) ? Math.floor(Math.random() * 255)  : parseInt(blue.val());
+      let wC = (isRandom) ? Math.floor(Math.random() * 255)  : parseInt(white.val());
+      let rgb = [rC, gC, bC];
+      if (isRgbW) {
+        rgb.push(wC);
+        off.push(0);
+        bufferLen = (pixLength * 4) + 5;
+      }
+
         if (x >= k - 1 && x <= k + 1) {
-            bytesToPost[bi] = parseInt(red.val());
+      
+            bytesToPost[bi] = (!isInverted) ? rC: 0;
             bi++;
-            bytesToPost[bi] = parseInt(green.val());
+            bytesToPost[bi] = (!isInverted) ? gC : 0;
             bi++;
-            bytesToPost[bi] = parseInt(blue.val());
+            bytesToPost[bi] = (!isInverted) ? bC : 0;
             bi++;
-            displayHex += toHexString(rgb);
+            displayHex += (!isInverted) ? toHexString(rgb) : toHexString(off);
             if (isRgbW) {
-                bytesToPost[bi] = parseInt(white.val());
+                bytesToPost[bi] = (!isInverted) ? wC : 0;
                 bi++;
             }
         } else {
-            bytesToPost[bi] = 0;
+            bytesToPost[bi] = (!isInverted) ? 0 : rC;
             bi++;
-            bytesToPost[bi] = 0;
+            bytesToPost[bi] = (!isInverted) ? 0 : gC;
             bi++;
-            bytesToPost[bi] = 0;
+            bytesToPost[bi] = (!isInverted) ? 0 : bC;
             bi++;
             if (isRgbW) {
-                bytesToPost[bi] = 0;
+                bytesToPost[bi] = (!isInverted) ? 0 : wC;
                 bi++;
             }
-            displayHex += toHexString(off);
+            displayHex += (!isInverted) ? toHexString(off) : toHexString(rgb);
         }
     }
 
     if (displayHex !== lastPushHex) {
         sendToEsp(bytesToPost);
     }
+
     //console.log(displayHex);
     output.val(displayHex);
     lastPushHex = displayHex;
-    lastPush = bytesToPost
+    lastPush = bytesToPost;
 }
 
 function xPixel(x) {
