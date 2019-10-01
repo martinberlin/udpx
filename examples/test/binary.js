@@ -102,6 +102,7 @@ function convertPixel(x) {
     if (displayHex !== lastPushHex) {
         sendToEsp(bytesToPost);
     }
+    //console.log(displayHex);
     output.val(displayHex);
     lastPushHex = displayHex;
     lastPush = bytesToPost
@@ -174,6 +175,7 @@ function xPixel(x) {
         }
     }
     output.val(displayHex);
+    //console.log(displayHex);
     sendToEsp(bytesToPost);
 }
 

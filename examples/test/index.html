@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<div class="container" style="max-width: 960px; margin: 0 auto">
+<div class="container" style="max-width:1000px; margin: 0 auto">
     <h4>Binary Generator for testing RGB(W) Stripes</h4>
     <form class="pure-form pure-form-stacked">
         <fieldset>
@@ -32,20 +32,30 @@
         </fieldset>
         <fieldset>
             <legend>Coloring</legend>
+            <div id="colors">
             <input id="r" type="number" max="255" maxlength="3" value="155" placeholder="R">
             <input id="g" type="number" max="255" maxlength="3" value="0" placeholder="G">
             <input id="b" type="number" max="255" maxlength="3" value="0" placeholder="B">
             <input id="w" type="number" max="255" maxlength="3" value="0" placeholder="W">
+            </div>
+            <label for="color_invert">
+                <input type="radio" name="mode" id="color_invert" checked> Invert background
+            </label>
+            
+            <label for="color_random">
+                <input type="radio" name="mode" id="color_random"> Random colors
+            </label>
+            
         </fieldset>
         <fieldset>
             <legend>Output</legend>
             <button type="button" id="btn2" class="pure-button">Reverse</button>
             <button type="button" id="btn1" class="pure-button pure-button-primary">Start</button>
             <button type="button" id="btn3" style="display: none">Test1</button>
-            <span>Send 1 frame:</span>
+            <span>Move 1</span>
             <button type="button" id="btnFirst">First</button>
-            <button type="button" id="btnMinus">&lt; -1</button>
-            <button type="button" id="btnPlus">+1 &gt;</button>
+            <button type="button" id="btnMinus">&lt;</button>
+            <button type="button" id="btnPlus">&gt;</button>
             <button type="button" id="btnLast">Last</button>
             <div id="box" class="stripe-box">
                 <div id="stripe"></div>
@@ -54,9 +64,9 @@
 
         <fieldset>
             <legend>Settings</legend>
-            <p>
+            
                 Send method:
-            </p>
+            
             <label for="http">
                 <input type="radio" name="mode" value="Http" id="http" checked>
                 HTTP
@@ -65,8 +75,11 @@
                 <input type="radio" name="mode" value="Udp" id="udp">
                 UDP
             </label>
-            <label for="duration">Duration:</label>
-            <input id="duration" type="number" max="10" maxlength="2" value="5">
+        
+            <label for="duration">
+                    <input id="duration" type="number" max="10" maxlength="2" value="5"> Duration
+            </label>
+            
             <button type="button" id="btnSaveFrame" class="pure-button">Save last sent frame as *.bin</button>
 
         </fieldset>

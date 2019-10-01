@@ -14,6 +14,9 @@ fieldset {
   margin: 0 10px;
 }
 
+#duration {
+  width: 4em;
+}
 textarea {
   font-family: monospace;
 }
@@ -29,20 +32,45 @@ input, button, textarea {
   background:#FF0000;
 }
 
+#http {
+  display: inline-block !important;
+}
+
+#udp {
+  display: inline-block !important;
+}
+
+#duration {
+  width: 5em;
+  display: inline-block;
+}
+
+.inline {
+  display: inline-block;
+}
+
 #r {
   background-color: #ff000029;
+  width: 5em;
+  display: inline-block;
 }
 
 #g {
   background-color: #00ff0821;
+  width: 5em;
+  display: inline-block;
 }
 
 #b {
   background-color: #0400ff21;
+  width: 5em;
+  display: inline-block;
 }
 
 #w {
   background-color: #efefef;
+  width: 5em;
+  display: inline-block;
 }
 
 .stripe-box {
