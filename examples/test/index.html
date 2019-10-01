@@ -12,7 +12,7 @@
 <body>
 <div class="container" style="max-width:1000px; margin: 0 auto">
     <h4>Binary Generator for testing RGB(W) Stripes</h4>
-    <form class="pure-form pure-form-stacked">
+    <form class="pure-form pure-form-stacked" id="main-form">
         <fieldset>
             <legend>
                 Stripe
@@ -26,27 +26,27 @@
                 RGBW
             </label>
             <label for="esp32_ip">ESP32 IP:</label>
-            <input id="esp32_ip" type="text" maxlength="15" 
+            <input id="esp32_ip" type="text" name="ip-adress" maxlength="15"
             value="192.168.43.126">
             <label for="stripe_length">Stripe length:</label>
-            <input id="stripe_length" type="number" max="999" maxlength="3" value="72">
+            <input id="stripe_length" type="number" max="999" maxlength="3" value="72" name="stripe-length">
         </fieldset>
         <fieldset>
             <legend>Coloring</legend>
             <div id="colors">
-            <input id="r" type="number" max="255" maxlength="3" value="155" placeholder="R">
-            <input id="g" type="number" max="255" maxlength="3" value="0" placeholder="G">
-            <input id="b" type="number" max="255" maxlength="3" value="0" placeholder="B">
-            <input id="w" type="number" max="255" maxlength="3" value="0" placeholder="W">
+            <input id="r" name="color-r" type="number" max="255" maxlength="3" value="155" placeholder="R">
+            <input id="g" name="color-g"type="number" max="255" maxlength="3" value="0" placeholder="G">
+            <input id="b" name="color-b"type="number" max="255" maxlength="3" value="0" placeholder="B">
+            <input id="w" name="color-w"type="number" max="255" maxlength="3" value="0" placeholder="W">
             </div>
             <label for="color_invert">
-                <input type="radio" name="mode" id="color_invert" checked> Invert background
+                <input type="checkbox" name="mode" id="color_invert" name="color-invert" checked> Invert background
             </label>
-            
+
             <label for="color_random">
-                <input type="radio" name="mode" id="color_random"> Random colors
+                <input type="checkbox" name="mode" id="color_random" name="color-random"> Random colors
             </label>
-            
+
         </fieldset>
         <fieldset>
             <legend>Output</legend>
@@ -65,22 +65,22 @@
 
         <fieldset>
             <legend>Settings</legend>
-            
+
                 Send method:
-            
+
             <label for="http">
-                <input type="radio" name="mode" value="Http" id="http">
+                <input type="radio" name="sending-mode" value="Http" id="http">
                 HTTP
             </label>
             <label for="udp">
-                <input type="radio" name="mode" value="Udp" id="udp" checked>
+                <input type="radio" name="sending-mode" value="Udp" id="udp" checked>
                 UDP
             </label>
-        
+
             <label for="duration">
-                    <input id="duration" type="number" max="10" maxlength="2" value="5"> Duration
+                    <input id="duration" name="duration" type="number" max="10" maxlength="2" value="5"> Duration
             </label>
-            
+
             <button type="button" id="btnSaveFrame" class="pure-button">Save last sent frame as *.bin</button>
 
         </fieldset>

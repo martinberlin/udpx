@@ -82,7 +82,7 @@ function convertPixel(x) {
       }
 
         if (x >= k - 1 && x <= k + 1) {
-      
+
             bytesToPost[bi] = (!isInverted) ? rC: 0;
             bi++;
             bytesToPost[bi] = (!isInverted) ? gC : 0;
@@ -237,6 +237,40 @@ function lineUpdate(tween) {
 function colorIt() {
     stripe.css("background-color", "rgb(" + red.val() + "," + green.val() + "," + blue.val() + ")");
 }
+
+/**
+ * Saves form state to localstorage
+ * @param $form to save in localstorage(jQuery object)
+ */
+function saveFormState($form) {
+  const formData = JSON.stringify($form.serializeArray());
+  window.localStorage.setItem($form.attr('id'), formData);
+}
+
+/**
+ * Loads form state from localstorage
+ * @param $form to load from localstorage(jQuery object)
+ */
+function loadFormState($form) {
+  const formData = JSON.parse(window.localStorage.getItem($form.attr('id')));
+  formData.forEach((item) =>{
+    const selector = `input[name="${ item.name }"], textarea[name="${ item.name }"]`
+    const input = $form.find(selector)
+    const newVal = item.value
+    input.val(newVal);
+  })
+}
+
+/**
+ * Load form state from localstorage and set handler
+ * to save form state on form change
+ */
+$('document').ready(function () {
+  loadFormState($('#main-form'))
+  $("#main-form input").change(function() {
+    saveFormState($(this).closest('form'));
+  });
+})
 
 /**
  * Creates a file out of the given body parameter and triggers a download of the created file
