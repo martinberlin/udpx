@@ -20,7 +20,7 @@ String lastWill;
 const size_t capacity = 144 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(144);
 DynamicJsonDocument doc(capacity);
 char bssid[9];
-s stream();
+s S(0x0, 0x1, false);
 
 // Debug mode prints to serial
 bool debugMode = DEBUG_MODE;
@@ -106,6 +106,16 @@ void brTask(void * input){
   // If it is necessary for a task to exit then have the task call vTaskDelete( NULL )
 }
 
+void s_callback(uint8_t *pyld, uint16_t length){
+  Serial.println("CALLBACK GOT ");
+  for(unsigned i = 0; i<length; i++){
+    Serial.print(pyld[i], HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
+  return;
+}
+
 void WiFiEvent(WiFiEvent_t event) {
     Serial.printf("[WiFi-event] event: %d\n", event);
     switch(event) {
@@ -178,9 +188,14 @@ void WiFiEvent(WiFiEvent_t event) {
         //printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
         printMessage("Len: ", false);
         printMessage(String(packet.length()), true);
+        for(unsigned i = 0; i<packet.length(); i++){
+          Serial.print(packet.data()[i], HEX);
+          Serial.print(" ");
+        }
+        Serial.println();
         unsigned long t = micros();
-        pix.receive(packet.data(), packet.length());
-        Serial.print(" Took ");
+        Serial.println(S.receive(packet.data(), packet.length()));
+        Serial.print("Took ");
         Serial.print(micros()-t);
         Serial.println(" micro seconds to consume");
         delay(0);
@@ -293,7 +308,8 @@ void setup()
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
   connectToWifi();
-  pix.init();
+  //pix.init();
+  S.setCallback(s_callback);
   WiFi.onEvent(WiFiEvent);
   // TODO: Update this with new define STATUS_TOPIC
   lastWill = "pixelcrasher/online-status/"+String(bssid);
