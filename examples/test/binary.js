@@ -1,4 +1,4 @@
-var stripe = $("div#stripe"),
+let stripe = $("div#stripe"),
     btn1 = $("button#btn1"),
     btn2 = $("button#btn2"),
     btn3 = $("button#btn3"),
@@ -6,6 +6,7 @@ var stripe = $("div#stripe"),
     btnMinus = $("button#btnMinus"),
     btnPlus = $("button#btnPlus"),
     btnLast = $("button#btnLast"),
+    btnSaveFrame = $("#btnSaveFrame"),
     http_mode = $("#http"),
     rgb = $("#rgb"),
     rgbw = $("#rgbw"),whiteIcon = $("#whiteIcon"),
@@ -25,6 +26,7 @@ var stripe = $("div#stripe"),
      });
 
      let lastPush;
+     let lastPushDownload;
 
 function toHexString(byteArray) {
   let out = Array.from(byteArray, function(byte) {
@@ -89,6 +91,7 @@ function convertPixel(x) {
   }
   output.val(displayHex);
   lastPush = displayHex;
+  lastPushDownload = bytesToPost;
 }
 
 function xPixel(x) {
@@ -146,6 +149,7 @@ function xPixel(x) {
   }
   output.val(displayHex);
   sendToEsp(bytesToPost);
+  lastPushDownload = bytesToPost;
 }
 
 function sendToEsp(bytesToPost) {
@@ -253,3 +257,73 @@ rgb.click(function()
   whiteIcon.removeClass("rgbw");
   white.prop("readonly", true);
 });
+
+/**
+ * Saves the last sent frame and allows the user to download.
+ * Uses timestamp in the filename to get unique filenames
+ */
+btnSaveFrame.click(function () {
+  const dateObj = new Date();
+  createAndDownloadBlobFile(lastPushDownload, `${dateObj.getTime()}-led-frame`)
+})
+
+/**
+ * Saves form state to localstorage
+ * @param $form to save in localstorage(jQuery object)
+ */
+function saveFormState($form) {
+  const formData = JSON.stringify($form.serializeArray());
+  window.localStorage.setItem($form.attr('id'), formData);
+}
+
+/**
+ * Loads form state from localstorage
+ * @param $form to load from localstorage(jQuery object)
+ */
+function loadFormState($form) {
+  const formData = JSON.parse(window.localStorage.getItem($form.attr('id')));
+  formData.forEach((item) =>{
+    const selector = `input[name="${ item.name }"], textarea[name="${ item.name }"]`
+    const input = $form.find(selector)
+    const newVal = item.value
+    input.val(newVal);
+  })
+}
+
+/**
+ * Load form state from localstorage and set handler
+ * to save form state on form change
+ */
+$('document').ready(function () {
+  loadFormState($('#main-form'))
+  $("#main-form input").change(function() {
+    saveFormState($(this).closest('form'));
+  });
+})
+
+/**
+ * Creates a file out of the given body parameter and triggers a download of the created file
+ * @param body the payload to add to the file
+ * @param filename
+ * @param extension (of the file)
+ */
+function createAndDownloadBlobFile(body, filename, extension = 'bin') {
+    const blob = new Blob([body]);
+    const fileName = `${filename}.${extension}`;
+    if (navigator.msSaveBlob) {
+        // IE 10+
+        navigator.msSaveBlob(blob, fileName);
+    } else {
+        const link = document.createElement('a');
+        // Browsers that support HTML5 download attribute
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+}
