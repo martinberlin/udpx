@@ -79,6 +79,14 @@ input, button, textarea {
   margin-top: 5px;
 }
 
+.stripe-box {
+  padding: 2px;
+  background: #dddd;
+  box-shadow: 0px 0px 7px inset rgba(0,0,0,0.4);
+  border-radius: 2px;
+  margin: 20px;
+}
+
 .fullwidth {
   width: 100%;
 }
