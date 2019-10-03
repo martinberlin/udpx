@@ -14,6 +14,7 @@ let stripe = $("div#stripe"),
     stripe_length = $("#stripe_length"),
     output = $("#out"),
     ip = $("#esp32_ip"),
+    udp_port = $("#udp_port"),
     compression = $("#compression"),
     delay = $("#duration"),
     iX = 0;
@@ -175,7 +176,7 @@ function sendToEsp(bytesToPost) {
       }); 
     } else {
       // Send using UDP to middleware
-        $.ajax("http://127.0.0.1:1234?ip="+ ip.val() +"&c=0",
+        $.ajax("http://127.0.0.1:1234?ip="+ ip.val() +"&port=" + udp_port.val(),
         {
         'data': bytesToPost, 
         'type': 'POST',

@@ -29,7 +29,7 @@ http.createServer((request, response) => {
     var query = url_parts.query;
     var outBuff = Buffer.concat(body);
     if (DEBUG)   console.log(body);
-    sendBuffer(outBuff, query.ip);
+    sendBuffer(outBuff, query.ip, query.port);
 
     response.end();
   })
@@ -38,12 +38,12 @@ http.createServer((request, response) => {
   });
 }).listen(1234);
 
-
-function sendBuffer(inBuffer, outHost) {
-    client.send(inBuffer, 0, inBuffer.length, PORT, outHost, function(err, bytes) {
+function sendBuffer(inBuffer, outHost, port) {
+    udpPort = (port) ? port : PORT;
+    client.send(inBuffer, 0, inBuffer.length, udpPort, outHost, function(err, bytes) {
         if (err) throw err;
 
-        if (DEBUG) console.log('Sent to ' + outHost +':'+ PORT);
+        if (DEBUG) console.log('Sent to ' + outHost +':'+ udpPort);
     });
 }
     
