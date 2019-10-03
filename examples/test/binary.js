@@ -190,7 +190,7 @@ function lineUpdate(tween)
 {
   tl1.progress(tween.progress());
   stripepos = stripe.position();
-  stripex = stripepos.left -10;
+  stripex = stripepos.left - xCorrection;
   ledstripex = parseInt((stripex*stripe_length.val())/288);
 
   convertPixel(ledstripex);
@@ -282,12 +282,15 @@ function saveFormState($form) {
  */
 function loadFormState($form) {
   const formData = JSON.parse(window.localStorage.getItem($form.attr('id')));
-  formData.forEach((item) =>{
-    const selector = `input[name="${ item.name }"], textarea[name="${ item.name }"]`
-    const input = $form.find(selector)
-    const newVal = item.value
-    input.val(newVal);
-  })
+  // This is not working, here is null formData: 
+  if (formData !== null) {
+    formData.forEach((item) =>{
+      const selector = `input[name="${ item.name }"], textarea[name="${ item.name }"]`
+      const input = $form.find(selector)
+      const newVal = item.value
+      input.val(newVal);
+    })
+  }
 }
 
 /**
