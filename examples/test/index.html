@@ -37,7 +37,7 @@ Todos:
             <input id="esp32_ip" type="text" name="ip-adress" maxlength="15"
             value="192.168.43.126">
             <label for="stripe_length">Stripe length:</label>
-            <input id="stripe_length" type="number" max="999" maxlength="3" value="72" name="stripe-length">
+            <input id="stripe_length" type="number" max="2999" maxlength="3" value="72" name="stripe-length">
         </fieldset>
         <fieldset>
             <legend>Coloring</legend>
@@ -67,7 +67,7 @@ Todos:
             <button type="button" id="btnMinus">&lt;</button>
             <button type="button" id="btnPlus">&gt;</button>
             <button type="button" id="btnLast">Last</button>
-            <div id="box">
+            <div id="box" class="stripe-box">
                 <div id="stripe"></div>
             </div>
         </fieldset>
