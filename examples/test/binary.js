@@ -49,34 +49,11 @@ function convertPixel(x) {
   let pixLength = stripe_length.val();
   isRgbW = rgbw.is(":checked") ?1:0;
   enableHex = enable_hex.is(":checked");
-  let offR = 0;
-  let offG = 0;
-  let offB = 0;
 
-  if (background_random.is(":checked")) {
-    offR = Math.floor(Math.random() * randomGeneratorMax);
-    offG = Math.floor(Math.random() * randomGeneratorMax);
-    offB = Math.floor(Math.random() * randomGeneratorMax);
-  } 
-  let off = [offR, offG, offB];
-  
-  rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
   let bufferLen = (pixLength*3)+5;
   if (isRgbW) {
-    rgb.push(parseInt(white.val()));
-    off.push(0);
     bufferLen = (pixLength*4)+5;
   } 
-  if (color_invert.is(":checked")) {
-    offR = rgb[0];
-    offG = rgb[1];
-    offB = rgb[2];
-    let tempOff = off;
-    off = rgb;
-    rgb = tempOff;
-    //console.log(off);
-  }
-
   // create an ArrayBuffer with a size in bytes
   var buffer = new ArrayBuffer(bufferLen);
   var bytesToPost = new Uint8Array(buffer); 
@@ -95,28 +72,55 @@ function convertPixel(x) {
   if (enableHex) {
     displayHex += toHexString(hByte); // Start the preview in HEX with headers
   }
-  
 
   for (var k = 1; k <= parseInt(stripe_length.val()); k++) {
-    if (x >= k-1 && x <= k+1) {
-      bytesToPost[bi] = parseInt(red.val());bi++;
-      bytesToPost[bi] = parseInt(green.val());bi++;
-      bytesToPost[bi] = parseInt(blue.val());bi++;
-      if (enableHex) displayHex += toHexString(rgb);
+    // Calculate background and foreground colors
+    let backR = 0;
+    let backG = 0;
+    let backB = 0;
+
+    if (background_random.is(":checked")) {
+      backR = Math.floor(Math.random() * randomGeneratorMax);
+      backG = Math.floor(Math.random() * randomGeneratorMax);
+      backB = Math.floor(Math.random() * randomGeneratorMax);
+    }
+    let foregroundColor = [backR, backG, backB];
+    let backgroundColor = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
+
+    if (color_invert.is(":checked") === false) {
+      foregroundColor = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
+      backgroundColor = [backR, backG, backB];
       if (isRgbW) {
-        bytesToPost[bi] = parseInt(white.val());bi++;
+        foregroundColor.push(parseInt(white.val()));
+        backgroundColor.push(0);
       }
     } else {
-      bytesToPost[bi] = offR;bi++;
-      bytesToPost[bi] = offG;bi++;
-      bytesToPost[bi] = offB;bi++;
       if (isRgbW) {
-        bytesToPost[bi] = 0;bi++;
+        foregroundColor.push(0);
+        backgroundColor.push(parseInt(white.val()));
       }
-      if (enableHex) displayHex += toHexString(off);
+    }
+
+    if (x >= k-1 && x <= k+1) {
+      bytesToPost[bi] = foregroundColor[0];bi++;
+      bytesToPost[bi] = foregroundColor[1];bi++;
+      bytesToPost[bi] = foregroundColor[2];bi++;
+      if (enableHex) displayHex += toHexString(foregroundColor);
+      if (isRgbW) {
+        bytesToPost[bi] = foregroundColor[3];bi++;
+      }
+    } else {
+
+      bytesToPost[bi] = backgroundColor[0];bi++;
+      bytesToPost[bi] = backgroundColor[1];bi++;
+      bytesToPost[bi] = backgroundColor[2];bi++;
+      if (isRgbW) {
+        bytesToPost[bi] = backgroundColor[3];bi++;
+      }
+      if (enableHex) displayHex += toHexString(backgroundColor);
     }
   }
-  
+
   if (JSON.stringify(bytesToPost) != JSON.stringify(lastPushDownload)) { 
     sendToEsp(bytesToPost);
   }
