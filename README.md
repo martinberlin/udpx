@@ -22,6 +22,7 @@ examples/test
     nodejs middleware.js 
     Send UDP packets to the ESP32 IP in both RGB / RGBW to certify it works, does not crash and fullfills expected behaviour.
 
+An [UDPX online tester](http://api.slosarek.eu/udpx/) is also available. 
 Please DO NOT merge in any stable branch before the tests pass. Keeping this methodology we will save the development team lot's of time that can be used wisely.
 
 ## Branching model
@@ -83,10 +84,10 @@ Use it only to check that compilation went right. For real tests please use the 
 
 Command line test:
 
-    cat examples/72-pix.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
+    cat examples/data-bin/72-pix.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
 
 Should turn on some Leds provided netcat is installed on your system.
 
-    cat examples/72-pix-off.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
+    cat examples/data-bin/72-pix-off.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
 
 Should turn off all leds in the 72 addressable led stripe. Use the 144-pix version to try this on 144 leds.

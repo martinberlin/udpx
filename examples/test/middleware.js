@@ -39,7 +39,7 @@ http.createServer((request, response) => {
 }).listen(1234);
 
 function sendBuffer(inBuffer, outHost, port) {
-    udpPort = (port) ? port : PORT;
+    udpPort = (port>0) ? port : PORT;
     client.send(inBuffer, 0, inBuffer.length, udpPort, outHost, function(err, bytes) {
         if (err) throw err;
 

@@ -39,8 +39,6 @@ Todos:
             <label for="udp_port">UDP Port:</label>
             <input id="udp_port" type="text" name="udp-port" maxlength="7"
             value="1234">
-            <label for="stripe_length">Stripe length:</label>
-            <input id="stripe_length" type="number" max="2999" maxlength="3" value="72" name="stripe-length">
         </fieldset>
         <fieldset>
             <legend>Coloring</legend>
@@ -49,16 +47,23 @@ Todos:
             <input id="g" name="color-g"type="number" max="255" maxlength="3" value="0" placeholder="G">
             <input id="b" name="color-b"type="number" max="255" maxlength="3" value="0" placeholder="B">
             <input id="w" name="color-w"type="number" max="255" maxlength="3" value="0" placeholder="W">
-            </div>
-            <!-- Not implemented
             <label for="color_invert">
-                <input type="checkbox" name="mode" id="color_invert" name="color-invert" checked> Invert background
+                <input type="checkbox" id="color_invert" name="color-invert"> Invert background
+            </label>
+            </div>
+            <label for="stripe_length">Stripe length:</label>
+            <input id="stripe_length" type="number" max="2999" maxlength="3" value="72" name="stripe-length">
+
+            <label for="enable_hex">
+                <input type="checkbox" name="enable_hex" id="enable_hex"> Enable HEX output (slower FPS)
+            </label>
+            <label for="background_random">
+                <input type="checkbox" id="background_random" name="background_random"> Random colors in background
             </label>
 
-            <label for="color_random">
-                <input type="checkbox" name="mode" id="color_random" name="color-random"> Random colors
-            </label>
-            -->
+            <br>For UDP please download this <a href="middleware.js"></a>file</a> and run:<br>
+            <pre>nodejs middleware.js</pre>
+            
         </fieldset>
         <fieldset>
             <legend>Output</legend>
@@ -107,12 +112,19 @@ Todos:
         <textarea id="out" rows="18" style="width: 100%">HEX Representation of binary data sent</textarea>
     </fieldset>
     </form> 
-    <script>
-        let xCorrection = 160;
-    </script>
+
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
     <script src="./binary.js"></script>
+
+    <script>
+    function getPos(el) {
+        var rect=el.getBoundingClientRect();
+        return {x:rect.left,y:rect.top};
+    }
+    let stripePosition = getPos(document.getElementById('stripe'));
+    let xCorrection = stripePosition.x;
+    </script>
 </div>
 </body>
 </html>

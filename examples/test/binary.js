@@ -17,17 +17,21 @@ let stripe = $("div#stripe"),
     udp_port = $("#udp_port"),
     compression = $("#compression"),
     delay = $("#duration"),
+    enable_hex = $("#enable_hex"),
+    color_invert = $("#color_invert"),
+    background_random = $("#background_random"),
     iX = 0;
 
-    tl1 = TweenMax.to(stripe, delay.val(), {
-      left:288,
-      onUpdate:lineUpdate,
-      onUpdateParams:["{self}"],
-      paused:true
-     });
+let randomGeneratorMax = 100;
 
-     let lastPush;
-     let lastPushDownload;
+tl1 = TweenMax.to(stripe, delay.val(), {
+  left:288,
+  onUpdate:lineUpdate,
+  onUpdateParams:["{self}"],
+  paused:true
+  });
+
+let lastPushDownload;
 
 function toHexString(byteArray) {
   let out = Array.from(byteArray, function(byte) {
@@ -36,12 +40,26 @@ function toHexString(byteArray) {
    return out+' ';
 }
 
+/**
+ * Main animation x to pixels converter
+ * @param {*} x 
+ */
 function convertPixel(x) {
   let displayHex = "";
   let pixLength = stripe_length.val();
   isRgbW = rgbw.is(":checked") ?1:0;
+  enableHex = enable_hex.is(":checked");
+  let offR = 0;
+  let offG = 0;
+  let offB = 0;
 
-  let off = [0,0,0];
+  if (background_random.is(":checked")) {
+    offR = Math.floor(Math.random() * randomGeneratorMax);
+    offG = Math.floor(Math.random() * randomGeneratorMax);
+    offB = Math.floor(Math.random() * randomGeneratorMax);
+  } 
+  let off = [offR, offG, offB];
+  
   rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
   let bufferLen = (pixLength*3)+5;
   if (isRgbW) {
@@ -49,6 +67,15 @@ function convertPixel(x) {
     off.push(0);
     bufferLen = (pixLength*4)+5;
   } 
+  if (color_invert.is(":checked")) {
+    offR = rgb[0];
+    offG = rgb[1];
+    offB = rgb[2];
+    let tempOff = off;
+    off = rgb;
+    rgb = tempOff;
+    //console.log(off);
+  }
 
   // create an ArrayBuffer with a size in bytes
   var buffer = new ArrayBuffer(bufferLen);
@@ -65,33 +92,37 @@ function convertPixel(x) {
   bytesToPost[bi] = hByte[2];bi++;  // unsigned 8-bit LED channel number
   bytesToPost[bi] = hByte[3];bi++;  // count(pixels) 16 bit, next too
   bytesToPost[bi] = hByte[4];bi++;  // Second part of count(pixels) not used here for now
-  displayHex += toHexString(hByte); // Start the preview in HEX with headers
+  if (enableHex) {
+    displayHex += toHexString(hByte); // Start the preview in HEX with headers
+  }
+  
 
   for (var k = 1; k <= parseInt(stripe_length.val()); k++) {
     if (x >= k-1 && x <= k+1) {
       bytesToPost[bi] = parseInt(red.val());bi++;
       bytesToPost[bi] = parseInt(green.val());bi++;
       bytesToPost[bi] = parseInt(blue.val());bi++;
-      displayHex += toHexString(rgb);
+      if (enableHex) displayHex += toHexString(rgb);
       if (isRgbW) {
         bytesToPost[bi] = parseInt(white.val());bi++;
       }
     } else {
-      bytesToPost[bi] = 0;bi++;
-      bytesToPost[bi] = 0;bi++;
-      bytesToPost[bi] = 0;bi++;
+      bytesToPost[bi] = offR;bi++;
+      bytesToPost[bi] = offG;bi++;
+      bytesToPost[bi] = offB;bi++;
       if (isRgbW) {
         bytesToPost[bi] = 0;bi++;
       }
-      displayHex += toHexString(off);
+      if (enableHex) displayHex += toHexString(off);
     }
   }
   
-  if (displayHex !== lastPush) { 
+  if (JSON.stringify(bytesToPost) != JSON.stringify(lastPushDownload)) { 
     sendToEsp(bytesToPost);
   }
-  output.val(displayHex);
-  lastPush = displayHex;
+  if (enableHex) {
+    output.val(displayHex);
+  }  
   lastPushDownload = bytesToPost;
 }
 
