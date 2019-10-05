@@ -6,7 +6,7 @@
  * 
  * And will send that data depending on the compressed flag as an UDP package to destination ip
  * 
- * Turn DEBUG false to disable console output
+ * Turn DEBUG false to disable console output so it's a bit faster
  */
 var DEBUG = true;
 var PORT = 1234;       // Default port
@@ -31,6 +31,8 @@ http.createServer((request, response) => {
     if (DEBUG)   console.log(body);
     sendBuffer(outBuff, query.ip, query.port);
 
+    response.setHeader("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.end();
   })
   .on('error', (err) => {
