@@ -15,8 +15,12 @@ UDPX represents the firmware where this Protocols will be tested and implemented
 [Martin Fasani](https://github.com/martinberlin) - Firmware and testing
 
 ## Additional libraries
+
 **S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the UDPX project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
+
 **Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
+
+Both where developed by Samuel and are used by UDPX. 
 
 ## Branches
 
