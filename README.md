@@ -6,7 +6,7 @@ This repository represents the Firmware part and it should be compiled using Pla
 [Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS
 UDPX represents the firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers.
 
-###TEAM
+### TEAM
 
 [Hendrik Putzek](https://github.com/hputzek)   - Front end / Nodejs, VUE
 
