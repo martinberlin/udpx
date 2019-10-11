@@ -1,23 +1,19 @@
 ![udpx Logo](/examples/udpix-logo.png)
 
-**udpx is a technology to transport data over WiFi.**
+**udpx is a technology to transport data over WiFi to microcontrollers**
 
 This repository represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
 [Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS
 UDPX represents the firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers.
 
-TEAM
+####TEAM
+
 [Hendrik Putzek](https://github.com/hputzek)   - Front end / Nodejs, VUE
 
 [Samuel Archibald](https://github.com/IoTPanic) - C++ / GO Api backend
 
-[Martin Fasani](https://github.com/martinberlin)    - Firmware and testing
+[Martin Fasani](https://github.com/martinberlin) - Firmware and testing
 
-### License
-
-This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
-
-It contains code and examples that can be used and copied freely for artistic works but in any way used for commercial projects. 
 ## Additional libraries
 **S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the UDPX project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
 **Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
@@ -116,3 +112,9 @@ Should turn on some Leds provided netcat is installed on your system.
     cat examples/72-pix-off.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
 
 Should turn off all leds in the 72 addressable led stripe. Use the 144-pix version to try this on 144 leds.
+
+### License
+
+This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
+
+It contains code and examples that can be used and copied freely for artistic works but in any way used for commercial projects. 
