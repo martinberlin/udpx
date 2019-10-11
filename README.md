@@ -1,22 +1,42 @@
 ![udpx Logo](/examples/udpix-logo.png)
 
-**udpx is a compression technology to transport data.**
+**udpx is a technology to transport data over WiFi.**
 
 This repository represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
 [Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS
+UDPX represents the firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers.
 
 TEAM
-Hendrik Putzek   - Front end / Nodejs, VUE
+[Hendrik Putzek](https://github.com/hputzek)   - Front end / Nodejs, VUE
 
-Samuel Archibald - C++ / GO Api backend
+[Samuel Archibald](https://github.com/IoTPanic) - C++ / GO Api backend
 
-Martin Fasani    - Firmware and testing
+[Martin Fasani](https://github.com/martinberlin)    - Firmware and testing
 
 ### License
 
 This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
 
 It contains code and examples that can be used and copied freely for artistic works but in any way used for commercial projects. 
+## Additional libraries
+**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the UDPX project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
+**Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
+
+## Branches
+
+
+**develop** Main branch only with Pixels protocol. 
+
+**feature/s** Implementing here the Pixels+S Protocol (Aka "Little stream" https://github.com/IoTPanic/s)
+
+**feature/tv-matrix** On this one we are experimenting sending compressed Pixels to a WS2812BALLPANEL Led matrix Panel 44x11 ([Demo with 484 pixels](https://twitter.com/martinfasani/status/1182244962395656192))
+
+**feature/tcp** A TCP experiment since Martin had to do something for a client that wanted to use HTTP, interesting to see how fast is UDP compared to TCP, just left there for research reasons.
+
+
+**feature/json-v0.1** Only for historical reasons, our first JSON + Brotli protocol, that was tested and even though the limitations [proved to be quite fast](https://twitter.com/martinfasani/status/1166106095858966529).
+
+
 
 ## Test after compiling
 
