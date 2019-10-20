@@ -29,10 +29,11 @@ Both where developed by Samuel and are used by UDPX. This firmware a part of int
 
 
 **develop** Main branch only with Pixels protocol. 
+DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
 
 **testing/s** Implementing here the Pixels+S Protocol (Aka "Little stream" https://github.com/IoTPanic/s)
 
-**feature/tv-matrix** On this one we are experimenting sending compressed Pixels to a WS2812BALLPANEL Led matrix Panel 44x11 ([Demo with 484 pixels](https://twitter.com/martinfasani/status/1182244962395656192))
+**feature/tv-matrix** On this one we are experimenting sending compressed Pixels to a WS2812BALLPANEL Led matrix Panel 44x11 ([Demo with 484 pixels](https://www.youtube.com/watch?v=rrMxOYCJIpY))
 
 **feature/tcp** A TCP experiment since Martin had to do something for a client that wanted to use HTTP, interesting to see how fast is UDP compared to TCP, just left there for research reasons.
 
@@ -128,5 +129,5 @@ Should turn off all leds in the 72 addressable led stripe. Use the 144-pix versi
 
 This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
 
-It contains code and examples that can be used and copied freely for artistic works and it can be also used for commercial projects provided you write as a line to explain how is going to be used and our license and credits are maintened.
+It contains code and examples that can be used and copied freely for artistic works and it can be also used for commercial projects provided you write as a line to explain how is going to be used and our license and credits are maintained.
 We put really a lot of time and effort building this Firmware and we would like to give proffesional support to integrate it in the future.
