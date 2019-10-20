@@ -78,7 +78,7 @@ UDP_PORT
 
 MQTT_ENABLE is set to false by default. Only required if you need to register the ESP32 in an external controller.
 
-    /lib/Output/Output.h
+    .pio/libdeps/BOARD/PIXELS/src/pixels.h
 
 The number of leds in the stripe: 
 
@@ -88,9 +88,13 @@ The data pin of the addressable leds:
 
 #define PIXELPIN 19
 
-This line will enable RGBW mode sending 4 bytes per pixel. Comment to use a RGB stripe in /lib/src/pixels/src/pixels.h
+Uncommenting this line will enable RGBW mode sending 4 bytes per pixel. It should be commented if you use RGB:
 
-#define RGBW
+    #define RGBW
+
+using RGB:
+
+    //#define RGBW
 
 **Note:** Using a RGB / RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp)
 
@@ -103,6 +107,8 @@ This line will enable RGBW mode sending 4 bytes per pixel. Comment to use a RGB 
 **2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster
 
 **2019-09** Tests and fixes to achieve a stable RGB, RGBW version
+
+**2019-10** Implementing and testing S library
 
 #### Old command line test
 
