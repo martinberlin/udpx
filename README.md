@@ -25,6 +25,14 @@ S is being currently tested and implemented in the **testing/s** branch of this 
 
 Both where developed by Samuel and are used by UDPX. This firmware a part of integrating this libraries has the MQTT part to register in Pixelpusher. Although all this is evolving and in the future they will be a [GO api](https://github.com/IoTPanic/pixelpusher) that may handle this part as well.
 
+## Testing the Firmware
+
+Although this repository has a **examples/test** where there is a small tester the official way to Test it is to use @hputzek NodeJs tester that is located in this Repository:
+
+https://github.com/hputzek/little-stream-protocol
+
+This will let you experience much better Framerate and it also supports S as a protocol. It has a FPS controller where you can adjust speed and a nice preview where you can select between random output or "snake" animation for testing purpouses among many other settings.
+
 ## Branches
 
 
