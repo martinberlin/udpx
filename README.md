@@ -31,7 +31,7 @@ Although this repository has a **examples/test** where there is a small tester t
 
 https://github.com/hputzek/little-stream-protocol
 
-This will let you experience much better Framerate and it also supports S as a protocol. It has a FPS controller where you can adjust speed and a nice preview where you can select between random output or "snake" animation for testing purpouses among many other settings.
+This will let you experience much better Framerate and it also supports S as a protocol. Among many fine adjust settings like Color it has aso a FPS slider where you can adjust speed and a nice preview. It's possible also to select between random output or "snake" animation for testing purposes.
 
 ## Branches
 
