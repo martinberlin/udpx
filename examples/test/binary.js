@@ -20,6 +20,7 @@ let stripe = $("div#stripe"),
     enable_hex = $("#enable_hex"),
     color_invert = $("#color_invert"),
     background_random = $("#background_random"),
+    protocol = $("#protocol"),
     iX = 0;
 
 let randomGeneratorMax = 100;
@@ -49,20 +50,36 @@ function convertPixel(x) {
   let pixLength = stripe_length.val();
   isRgbW = rgbw.is(":checked") ?1:0;
   enableHex = enable_hex.is(":checked");
-
-  let bufferLen = (pixLength*3)+5;
-  if (isRgbW) {
-    bufferLen = (pixLength*4)+5;
-  } 
-  // create an ArrayBuffer with a size in bytes
-  var buffer = new ArrayBuffer(bufferLen);
-  var bytesToPost = new Uint8Array(buffer); 
   bi = 0;
 
   let MSB = parseInt(pixLength/256);
   let LSB = pixLength - (MSB*256);
   // header bytes - Todo: Add this in his own function
-  hByte = [80,0,0,LSB,MSB];
+
+  switch (protocol.val()) {
+    case 'pixels':
+        hByte = [80,0,0,LSB,MSB];
+        headerBytes = 5;
+        cByte1 = parseInt(red.val());
+        cByte2 = parseInt(green.val());
+        cByte3 = parseInt(blue.val());
+    break;
+    case 'RGB888':
+        hByte = [1,0,0,0,LSB,MSB];
+        headerBytes = 6;
+        cByte1 = parseInt(blue.val());
+        cByte2 = parseInt(red.val());
+        cByte3 = parseInt(green.val());
+    break;
+  }
+  let bufferLen = (pixLength*3)+headerBytes;
+  if (isRgbW) {
+    bufferLen = (pixLength*4)+headerBytes;
+  }
+  // create an ArrayBuffer with a size in bytes
+  var buffer = new ArrayBuffer(bufferLen);
+  var bytesToPost = new Uint8Array(buffer); 
+  
   //console.log(hByte); // Debug headers
   bytesToPost[bi] = hByte[0];bi++;  // p
   bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
@@ -85,10 +102,10 @@ function convertPixel(x) {
       backB = Math.floor(Math.random() * randomGeneratorMax);
     }
     let foregroundColor = [backR, backG, backB];
-    let backgroundColor = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
+    let backgroundColor = [cByte1, cByte2, cByte3];
 
     if (color_invert.is(":checked") === false) {
-      foregroundColor = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
+      foregroundColor = [cByte1, cByte2, cByte3];
       backgroundColor = [backR, backG, backB];
       if (isRgbW) {
         foregroundColor.push(parseInt(white.val()));
@@ -139,18 +156,37 @@ function xPixel(x) {
   isRgbW = rgbw.is(":checked") ?1:0;
   let displayHex = "";
   let off = [0,0,0];
-  let rgb = [parseInt(red.val()), parseInt(green.val()), parseInt(blue.val())];
-  let bufferLen = (pixLength*3)+5;
+  
+  let MSB = parseInt(pixLength/256);
+  let LSB = pixLength - (MSB*256);
+
+  switch (protocol.val()) {
+    case 'pixels':
+        hByte = [80,0,0,LSB,MSB];
+        headerBytes = 5;
+        cByte1 = parseInt(red.val());
+        cByte2 = parseInt(green.val());
+        cByte3 = parseInt(blue.val());
+    break;
+    case 'RGB888':
+        hByte = [1,0,0,0,LSB,MSB];
+        headerBytes = 6;
+        cByte1 = parseInt(blue.val());
+        cByte2 = parseInt(red.val());
+        cByte3 = parseInt(green.val());
+    break;
+  }
+  let rgb = [cByte1, cByte2, cByte3];
+
+  let bufferLen = (pixLength*3)+headerBytes;
+  if (isRgbW) {
+    bufferLen = (pixLength*4)+headerBytes;
+  }
   if (isRgbW) {
     rgb.push(parseInt(white.val()));
     off.push(0);
     bufferLen = (pixLength*4)+5;
   }   
-  let MSB = parseInt(pixLength/256);
-  let LSB = pixLength - (MSB*256);
-  // header bytes
-  hByte = [80,0,0,LSB,MSB];
-  
   // create an ArrayBuffer with a size in bytes
   var buffer = new ArrayBuffer(bufferLen);
   // Treat buffer as a view of 8-bit unsigned integer 
@@ -165,9 +201,9 @@ function xPixel(x) {
 
   for (var k = 1; k <= parseInt(pixLength); k++) {
     if (x === k) {
-      bytesToPost[bi] = parseInt(red.val());bi++;
-      bytesToPost[bi] = parseInt(green.val());bi++;
-      bytesToPost[bi] = parseInt(blue.val());bi++;
+      bytesToPost[bi] = cByte1;bi++;
+      bytesToPost[bi] = cByte2;bi++;
+      bytesToPost[bi] = cByte3;bi++;
       if (isRgbW) {
         bytesToPost[bi] = parseInt(white.val());bi++;
       }

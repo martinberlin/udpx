@@ -4,5 +4,5 @@
 .vscode
 .idea
 lib/Config/Config.h
-examples/greensock/node_modules/
-examples/greensock/npm-debug.log
+examples/test/node_modules/
+examples/test/npm-debug.log
