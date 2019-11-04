@@ -42,11 +42,12 @@ tl1 = TweenMax.to(stripe, delay.val(), {
 
 let lastPushDownload;
 
-function toHexString(byteArray) {
+function toHexString(byteArray, addSpace = true) {
   let out = Array.from(byteArray, function(byte) {
     return ('0' + (byte & 0xFF).toString(16)).slice(-2).toUpperCase();
   }).join(' '); 
-   return out+' ';
+  let space = (addSpace) ? ' ' : '';
+   return out+space;
 }
 
 /**
@@ -58,26 +59,22 @@ function convertPixel(x) {
   let pixLength = stripe_length.val();
   isRgbW = rgbw.is(":checked") ?1:0;
   enableHex = enable_hex.is(":checked");
-  bi = 0;
 
   let MSB = parseInt(pixLength/256);
   let LSB = pixLength - (MSB*256);
   // header bytes - Todo: Add this in his own function
+  cByte1 = parseInt(red.val());
+  cByte2 = parseInt(green.val());
+  cByte3 = parseInt(blue.val());
 
   switch (protocol.val()) {
     case 'pixels':
         hByte = [80,0,0,LSB,MSB];
         headerBytes = 5;
-        cByte1 = parseInt(red.val());
-        cByte2 = parseInt(green.val());
-        cByte3 = parseInt(blue.val());
     break;
     case 'RGB888':
         hByte = [1,0,0,0,LSB,MSB];
         headerBytes = 6;
-        cByte1 = parseInt(blue.val());
-        cByte2 = parseInt(red.val());
-        cByte3 = parseInt(green.val());
     break;
   }
   let bufferLen = (pixLength*3)+headerBytes;
@@ -88,14 +85,18 @@ function convertPixel(x) {
   var buffer = new ArrayBuffer(bufferLen);
   var bytesToPost = new Uint8Array(buffer); 
   
-  //console.log(hByte); // Debug headers
+  let bi = 0;
   bytesToPost[bi] = hByte[0];bi++;  // p
   bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
   bytesToPost[bi] = hByte[2];bi++;  // unsigned 8-bit LED channel number
   bytesToPost[bi] = hByte[3];bi++;  // count(pixels) 16 bit, next too
   bytesToPost[bi] = hByte[4];bi++;  // Second part of count(pixels) not used here for now
+  if (protocol.val() === 'RGB888') {
+    bytesToPost[bi] = hByte[5];bi++;
+  }
+  
   if (enableHex) {
-    displayHex += toHexString(hByte); // Start the preview in HEX with headers
+    displayHex += toHexString(hByte,false) +"|";
   }
 
   for (var k = 1; k <= parseInt(stripe_length.val()); k++) {
@@ -167,21 +168,18 @@ function xPixel(x) {
   
   let MSB = parseInt(pixLength/256);
   let LSB = pixLength - (MSB*256);
+  cByte1 = parseInt(red.val());
+  cByte2 = parseInt(green.val());
+  cByte3 = parseInt(blue.val());
 
   switch (protocol.val()) {
     case 'pixels':
         hByte = [80,0,0,LSB,MSB];
         headerBytes = 5;
-        cByte1 = parseInt(red.val());
-        cByte2 = parseInt(green.val());
-        cByte3 = parseInt(blue.val());
     break;
     case 'RGB888':
         hByte = [1,0,0,0,LSB,MSB];
         headerBytes = 6;
-        cByte1 = parseInt(blue.val());
-        cByte2 = parseInt(red.val());
-        cByte3 = parseInt(green.val());
     break;
   }
   let rgb = [cByte1, cByte2, cByte3];
@@ -200,12 +198,15 @@ function xPixel(x) {
   // Treat buffer as a view of 8-bit unsigned integer 
   var bytesToPost = new Uint8Array(buffer); 
   bi = 0;
-  bytesToPost[bi] = hByte[0];bi++;  // p
-  bytesToPost[bi] = hByte[1];bi++;  // Future features (not used)
-  bytesToPost[bi] = hByte[2];bi++;  // unsigned 8-bit LED channel number
-  bytesToPost[bi] = hByte[3];bi++;  // count(pixels) 16 bit, next too
-  bytesToPost[bi] = hByte[4];bi++;  // Second part of count(pixels) not used here for now
-  displayHex += toHexString(hByte); // Start the preview in HEX with headers
+  bytesToPost[bi] = hByte[0];bi++;
+  bytesToPost[bi] = hByte[1];bi++;
+  bytesToPost[bi] = hByte[2];bi++;
+  bytesToPost[bi] = hByte[3];bi++;
+  bytesToPost[bi] = hByte[4];bi++;
+  if (protocol.val() === 'RGB888') {
+    bytesToPost[bi] = hByte[5];bi++;
+  }
+  displayHex += toHexString(hByte,false) +"|"; // Start the preview in HEX with headers
 
   for (var k = 1; k <= parseInt(pixLength); k++) {
     if (x === k) {
