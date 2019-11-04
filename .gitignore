@@ -4,5 +4,6 @@
 .vscode
 .idea
 lib/Config/Config.h
+examples/tv/node_modules/
 examples/test/node_modules/
 examples/test/npm-debug.log

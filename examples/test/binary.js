@@ -22,7 +22,15 @@ let stripe = $("div#stripe"),
     background_random = $("#background_random"),
     protocol = $("#protocol"),
     iX = 0;
+    selectedPort = udp_port.val();
 
+    protocol.change(function() {
+      if (protocol.val()==='RGB888') {
+        udp_port.val('6454');
+      } else {
+        udp_port.val(selectedPort);
+      }
+    });
 let randomGeneratorMax = 100;
 
 tl1 = TweenMax.to(stripe, delay.val(), {

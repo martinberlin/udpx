@@ -174,17 +174,14 @@ void WiFiEvent(WiFiEvent_t event) {
         Serial.println(UDP_PORT);
 
     // Executes on UDP receive
-    udp.onPacket([](AsyncUDPPacket packet) {
-        //printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
-        printMessage("Len: ", false);
-        printMessage(String(packet.length()), true);
-        unsigned long t = micros();
+    udp.onPacket([](AsyncUDPPacket packet) {       
         pix.receive(packet.data(), packet.length());
-        Serial.print(" Took ");
-        Serial.print(micros()-t);
-        Serial.println(" micro seconds to consume");
-        delay(0);
+
+        if (DEBUG_MODE) {
+          printMessage("UDP packet from: ",false);printMessage(String(packet.remoteIP()));
+        }
         }); 
+
     } else {
       Serial.println("UDP Lister could not be started");
     }
