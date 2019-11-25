@@ -2,9 +2,13 @@
 
 **udpx is a technology to transport data over WiFi to microcontrollers**
 
+### Android App latest builds
 
-[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS.
-UDPX represents the ESP32 firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers.
+If you want to test this fast using an App please try latest APK builds, just download and install:
+
+[app-debug.apk](https://storage.luckycloud.de/d/0c007c42956746c186a1/?p=/android)
+
+The [udpx Android App](https://github.com/martinberlin/udpx) is open source. Feel free to explore and learn Cordova to make hybrid apps.
 
 ### TEAM
 
@@ -25,6 +29,11 @@ S is being currently tested and implemented in the **testing/s** branch of this 
 
 Both where developed by Samuel and are used by UDPX. This firmware a part of integrating this libraries has the MQTT part to register in Pixelpusher. Although all this is evolving and in the future they will be a [GO api](https://github.com/IoTPanic/pixelpusher) that may handle this part as well.
 
+## Mission of this originally was
+
+[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS.
+UDPX represents the ESP32 firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers. Is still a work in progress.
+
 ## Testing the Firmware
 
 Although this repository has a **examples/test** where there is a small tester the official way to Test it is to use @hputzek NodeJs tester that is located in this Repository:
@@ -34,7 +43,6 @@ https://github.com/hputzek/little-stream-protocol
 This will let you experience much better Framerate and it also supports S as a protocol. Among many fine adjust settings like Color it has aso a FPS slider where you can adjust speed and a nice preview. It's possible also to select between random output or "snake" animation for testing purposes.
 
 ## Branches
-
 
 **develop** Main branch only with Pixels protocol. 
 DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
