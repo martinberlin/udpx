@@ -8,7 +8,7 @@ If you want to test this fast using an App please try latest APK builds, just do
 
 [app-debug.apk](https://storage.luckycloud.de/d/0c007c42956746c186a1/?p=/android)
 
-The [udpx Android App](https://github.com/martinberlin/udpx) is open source. Feel free to explore and learn Cordova to make hybrid apps.
+The [udpx Android App](https://github.com/martinberlin/udpx-app) is open source. Feel free to explore and learn Cordova to make hybrid apps.
 
 ### TEAM
 
