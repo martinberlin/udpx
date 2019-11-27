@@ -4,11 +4,11 @@
 
 ### Android App latest builds
 
-If you want to test this fast using an App please try latest APK builds, just download and install:
+If you want to test this fast using an App please try latest APK builds, just download and install the signed App:
 
-[app-debug.apk](https://storage.luckycloud.de/d/0c007c42956746c186a1/?p=/android)
+[Pick latest APK release](https://storage.luckycloud.de/#my-libs/lib/0a61e825-1607-4b8e-9a2c-cdf43cd17041/udpx/android/releases)
 
-The [udpx Android App](https://github.com/martinberlin/udpx-app) is open source. Feel free to explore and learn Cordova to make hybrid apps.
+The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
 
 ### TEAM
 
@@ -48,8 +48,6 @@ This will let you experience much better Framerate and it also supports S as a p
 DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
 
 **testing/s** Implementing here the Pixels+S Protocol (Aka "Little stream" https://github.com/IoTPanic/s)
-
-**feature/tv-matrix** On this one we are experimenting sending compressed Pixels to a WS2812BALLPANEL Led matrix Panel 44x11 ([Demo with 484 pixels](https://www.youtube.com/watch?v=rrMxOYCJIpY))
 
 **feature/tcp** A TCP experiment since Martin had to do something for a client that wanted to use HTTP, interesting to see how fast is UDP compared to TCP, just left there for research reasons.
 
@@ -116,6 +114,8 @@ using RGB:
 **Note:** Using a RGB / RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp)
 
 ### History
+
+**2019-11** Martin worked out first a very raw Chrome App to send udp directly without middleware. This experiment lead to make a full pfledged [Android Application](http://udpx.fasani.de)
 
 **2019-06** Started working with Front-end developer [Hendrik Putzek](https://twitter.com/hputzek) to develop a firmware solution to transport a lot of frames per seconds from his Nodejs backend to a Led controller
 
