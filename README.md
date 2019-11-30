@@ -4,7 +4,9 @@
 
 ### Android App latest builds
 
-If you want to test this fast using Android, just download and install the udpx app from Play store: [[[/examples/udpx-app-180x120.jpg]]](https://play.google.com/store/apps/details?id=io.cordova.udpx) 
+If you want to test this fast using Android, just download and install the udpx app from Play store: 
+<a href="https://play.google.com/store/apps/details?id=io.cordova.udpx" />
+<img src="/examples/udpx-app-180x120.jpg" />
 [udpx esp32](https://play.google.com/store/apps/details?id=io.cordova.udpx)
 
 The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
