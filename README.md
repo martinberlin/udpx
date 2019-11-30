@@ -4,9 +4,9 @@
 
 ### Android App latest builds
 
-If you want to test this fast using an App please try latest APK builds, just download and install the signed App:
-
-[Pick latest APK release](https://storage.luckycloud.de/#my-libs/lib/0a61e825-1607-4b8e-9a2c-cdf43cd17041/udpx/android/releases)
+If you want to test this fast using Android, just download and install the udpx app from Play store:
+![udpx Logo](/examples/udpx-app-180x120.jpg)
+[udpx esp32](https://play.google.com/store/apps/details?id=io.cordova.udpx)
 
 The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
 
