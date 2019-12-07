@@ -106,10 +106,12 @@ void brTask(void * compressed){
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
-	  SerialBT.end();delay(5);
+	  SerialBT.end();delay(50);
 	#endif
 
   if (isConnected) return;
+	// Interval to measure FPS  (millis, function called, times invoked for 1000ms around 1 hr and half)
+	timer.setTimer(1000, timerCallback, 6000);
 
   	isConnected = true;
 	connStatusChanged = true;
@@ -125,15 +127,13 @@ void gotIP(system_event_id_t event) {
       Serial.println("UDP Listening on: ");
       Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
 
-      // Interval to measure FPS  (millis, function called, times invoked for 1000ms around 1 hr and half)
-      timer.setTimer(1000, timerCallback, 6000);
-
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
       
         if ((int) packet.data()[0] == 80) {
         // Non compressed
           pix.receive(packet.data(), packet.length());
+		  frameCounter++;
         } else {
           receivedLength = packet.length();
           xTaskCreatePinnedToCore(
@@ -144,7 +144,7 @@ void gotIP(system_event_id_t event) {
                     9,            
                     &brotliTask,  
                     0);           
-          delay(1);  
+          delay(2);  
         }
 
         }); 
@@ -493,15 +493,13 @@ void setup()
 			connectWiFi();
 		}
 	}
-  #endif
-
-  
-  #ifdef WIFI_AP
+	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
     WiFi.onEvent(lostCon, SYSTEM_EVENT_STA_DISCONNECTED);
     Serial.println("Connecting to Wi-Fi using WIFI_AP");
     WiFi.begin(WIFI_SSID, WIFI_PASS);
   #endif
+
 }
 
 void loop() {
@@ -509,7 +507,7 @@ void loop() {
 
   #ifdef WIFI_BLE
   if (SerialBT.available() != 0) {
-		readBTSerial();
-	}
+	readBTSerial();
+  }
   #endif
 }
