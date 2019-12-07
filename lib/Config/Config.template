@@ -1,6 +1,14 @@
 // Configuration
 #define DEBUG_MODE true
+#define UDPX_VERSION "1.1"
 
+// Only one of this two options should be enabled, either WIFI_BLE or WIFI_AP
+// Enable WIFI_BLE to receive WiFi config over bluetooth
+#define WIFI_BLE
+// Enable WIFI_AP to use a fixed SSID /PASS
+//#define WIFI_AP
+
+// If WIFI_AP is selected then
 #define WIFI_SSID "KabelBox-A210"
 #define WIFI_PASS ""
 
