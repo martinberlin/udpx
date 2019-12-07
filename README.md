@@ -23,12 +23,14 @@ UDPX is a collaborative effort where a team of 3 have same access level to the r
 
 ## Additional libraries
 
-**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the UDPX project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
-S is being currently tested and implemented in the **testing/s** branch of this repository.
-
 **Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
 
 Both where developed by Samuel and are used by UDPX. This firmware a part of integrating this libraries has the MQTT part to register in Pixelpusher. Although all this is evolving and in the future they will be a [GO api](https://github.com/IoTPanic/pixelpusher) that may handle this part as well.
+
+Not on this branch: 
+**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the udpx project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
+S is being currently tested and implemented in the **testing/s** branch of this repository.
+
 
 ## Mission of this originally was
 
@@ -57,7 +59,7 @@ DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
 
 ## Test after compiling
 
-Main test that should pass before merging in develop: 
+Main test if you don't want to use the Android app that should pass before merging in develop: 
 
 examples/test
 
@@ -115,6 +117,8 @@ using RGB:
 **Note:** Using a RGB / RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp)
 
 ### History
+
+**2019-12** Martin converted his Chrome App example into a Android cordova hibryd app that is running only on Android platform for now.
 
 **2019-11** Martin worked out first a very raw Chrome App to send udp directly without middleware. This experiment lead to make a full pfledged [Android Application](http://udpx.fasani.de)
 
