@@ -49,19 +49,6 @@ String ipAddress2String(const IPAddress& ipAddress){
   String(ipAddress[2]) + String(".") +\
   String(ipAddress[3]);
 }
-/**
- * Generic message printer. Modify this if you want to send this messages elsewhere (Display)
- */
-void printMessage(String message, bool newline = true)
-{
-  if (debugMode) {
-    if (newline) {
-      Serial.println(message);
-    } else {
-      Serial.print(message);
-    }
-   }
-}
 
 #ifdef WIFI_BLE
   #include <nvs.h>
@@ -118,6 +105,22 @@ void brTask(void * compressed){
 }
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
+	#ifdef WIFI_BLE
+	  SerialBT.end();delay(5);
+	#endif
+
+  if (isConnected) return;
+
+  	isConnected = true;
+	connStatusChanged = true;
+
+	if (!MDNS.begin(apName)) {
+		Serial.println("Error setting up MDNS responder!");
+    }
+	Serial.println((String(apName)+".local is online"));
+    MDNS.addService("http", "tcp", 80);
+
+
   if(udp.listen(UDP_PORT)) {
       Serial.println("UDP Listening on: ");
       Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
@@ -149,18 +152,6 @@ void gotIP(system_event_id_t event) {
     } else {
       Serial.println("UDP Lister could not be started");
     }
-
-	isConnected = true;
-	connStatusChanged = true;
-
-	MDNS.begin(apName);
-	delay(100);
-    MDNS.addService("http", "tcp", 80);
-    printMessage(String(apName)+".local mDns started");
-
-	#ifdef WIFI_BLE
-    	SerialBT.end();
-	#endif
 }
 
 /** Callback for connection loss */
@@ -508,7 +499,7 @@ void setup()
   #ifdef WIFI_AP
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
     WiFi.onEvent(lostCon, SYSTEM_EVENT_STA_DISCONNECTED);
-    Serial.println("Connecting to Wi-Fi...");
+    Serial.println("Connecting to Wi-Fi using WIFI_AP");
     WiFi.begin(WIFI_SSID, WIFI_PASS);
   #endif
 }
