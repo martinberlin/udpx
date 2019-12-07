@@ -108,7 +108,7 @@ void brTask(void * compressed){
 void gotIP(system_event_id_t event) {
   if(udp.listen(UDP_PORT)) {
         Serial.println("UDP Listening on IP: "); Serial.print(WiFi.localIP());
-        Serial.println(UDP_PORT);
+        Serial.println(":"+UDP_PORT);
 
       // Interval to measure FPS  (millis, function called, times invoked for 1000ms around 1 hr and half)
       timer.setTimer(1000, timerCallback, 6000);
@@ -121,7 +121,6 @@ void gotIP(system_event_id_t event) {
           pix.receive(packet.data(), packet.length());
         } else {
           receivedLength = packet.length();
-
           xTaskCreatePinnedToCore(
                     brTask,        
                     "uncompress", 
