@@ -8,7 +8,7 @@
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
 
-#define BROTLI_DECOMPRESSION_BUFFER 6000
+#define BROTLI_DECOMPRESSION_BUFFER 3000
 TaskHandle_t brotliTask;
 size_t receivedLength;
 TimerHandle_t wifiReconnectTimer;
@@ -63,6 +63,18 @@ void printMessage(String message, bool newline = true)
    }
 }
 
+#ifdef WIFI_BLE
+  #include <nvs.h>
+  #include <nvs_flash.h>
+  #include "BluetoothSerial.h"
+  #include <Preferences.h>
+    // SerialBT class
+  BluetoothSerial SerialBT;
+
+  /** Buffer for JSON string */
+  StaticJsonDocument<200> jsonBuffer;
+#endif
+
 void timerCallback(){
   if (frameLastCounter != frameCounter) {
     Serial.printf("FPS: %d Frames received: %d\n", frameCounter-frameLastCounter, frameCounter);
@@ -107,8 +119,8 @@ void brTask(void * compressed){
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
   if(udp.listen(UDP_PORT)) {
-        Serial.println("UDP Listening on IP: "); Serial.print(WiFi.localIP());
-        Serial.println(":"+UDP_PORT);
+      Serial.println("UDP Listening on: ");
+      Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
 
       // Interval to measure FPS  (millis, function called, times invoked for 1000ms around 1 hr and half)
       timer.setTimer(1000, timerCallback, 6000);
@@ -145,6 +157,8 @@ void gotIP(system_event_id_t event) {
 	delay(100);
     MDNS.addService("http", "tcp", 80);
     printMessage(String(apName)+".local mDns started");
+
+    SerialBT.end();
 }
 
 /** Callback for connection loss */
@@ -159,10 +173,7 @@ void lostCon(system_event_id_t event) {
 
 // Includes for Bluetooth Serial configuration
 #ifdef WIFI_BLE
-  #include <nvs.h>
-  #include <nvs_flash.h>
-  #include "BluetoothSerial.h"
-  #include <Preferences.h>
+
   // WiFi credentials storage
   Preferences preferences; 
   /**
@@ -175,12 +186,6 @@ void createName() {
 	// Write unique name into apName
 	sprintf(apName, "udpx-%02X%02X%02X%02X%02X%02X_%d", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5], UDP_PORT);
 }
-
-// SerialBT class
-BluetoothSerial SerialBT;
-
-/** Buffer for JSON string */
-StaticJsonDocument<200> jsonBuffer;
 
 /**
  * initBTSerial
@@ -506,9 +511,7 @@ void setup()
 		}
 	}
   #endif
-  // Set up automatic reconnect timers
-  wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectWifi));
-  connectWifi();
+  
 }
 
 void loop() {
