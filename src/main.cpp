@@ -158,7 +158,9 @@ void gotIP(system_event_id_t event) {
     MDNS.addService("http", "tcp", 80);
     printMessage(String(apName)+".local mDns started");
 
-    SerialBT.end();
+	#ifdef WIFI_BLE
+    	SerialBT.end();
+	#endif
 }
 
 /** Callback for connection loss */
@@ -442,16 +444,6 @@ void readBTSerial() {
 }
 #endif
 
-#ifdef WIFI_AP
-  void connectWifi() {
-    WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
-    WiFi.onEvent(lostCon, SYSTEM_EVENT_STA_DISCONNECTED);
-
-    Serial.println("Connecting to Wi-Fi...");
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-  }
-#endif
-
 /**
  * Convert the IP to string 
  */
@@ -511,7 +503,14 @@ void setup()
 		}
 	}
   #endif
+
   
+  #ifdef WIFI_AP
+	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
+    WiFi.onEvent(lostCon, SYSTEM_EVENT_STA_DISCONNECTED);
+    Serial.println("Connecting to Wi-Fi...");
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+  #endif
 }
 
 void loop() {
