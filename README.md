@@ -1,16 +1,59 @@
 ![udpx Logo](/examples/udpix-logo.png)
 
-**udpx is a compression technology to transport data.**
+**udpx is a technology to transport data over WiFi to microcontrollers**
 
-This technology will be used in a future project in partnership with Hendrik Putzek but can be individually tested as mean to transport compressed data between devices.
-We are using [Brotli](http://manpages.ubuntu.com/manpages/bionic/man1/brotli.1.html) as a compression algorithm to transport data between frontend (nodejs) and the firmware (esp32)
-This library represents the Firmware part and it should be compiled using Platformio in a ESP32 board. 
+### Android App latest builds
 
-### License
+If you want to test this fast using Android, just download and install the udpx app from Play store: 
+<a href="https://play.google.com/store/apps/details?id=io.cordova.udpx" />
+<img src="/examples/udpx-app-180x120.jpg" />
+[udpx esp32](https://play.google.com/store/apps/details?id=io.cordova.udpx)
 
-This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
+The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
 
-It contains code and examples that can be used and copied freely for artistic works but in any way used for commercial projects. 
+### TEAM
+
+UDPX is a collaborative effort where a team of 3 have same access level to the repository:
+
+[Hendrik Putzek](https://github.com/hputzek)   - Front end / Nodejs, VUE
+
+[Samuel Archibald](https://github.com/IoTPanic) - C++ / GO Api backend
+
+[Martin Fasani](https://github.com/martinberlin) - Firmware and testing
+
+## Additional libraries
+
+**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the UDPX project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
+S is being currently tested and implemented in the **testing/s** branch of this repository.
+
+**Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
+
+Both where developed by Samuel and are used by UDPX. This firmware a part of integrating this libraries has the MQTT part to register in Pixelpusher. Although all this is evolving and in the future they will be a [GO api](https://github.com/IoTPanic/pixelpusher) that may handle this part as well.
+
+## Mission of this originally was
+
+[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS.
+UDPX represents the ESP32 firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers. Is still a work in progress.
+
+## Testing the Firmware
+
+Although this repository has a **examples/test** where there is a small tester the official way to Test it is to use @hputzek NodeJs tester that is located in this Repository:
+
+https://github.com/hputzek/little-stream-protocol
+
+This will let you experience much better Framerate and it also supports S as a protocol. Among many fine adjust settings like Color it has aso a FPS slider where you can adjust speed and a nice preview. It's possible also to select between random output or "snake" animation for testing purposes.
+
+## Branches
+
+**develop** Main branch only with Pixels protocol. 
+DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
+
+**testing/s** Implementing here the Pixels+S Protocol (Aka "Little stream" https://github.com/IoTPanic/s)
+
+**feature/tcp** A TCP experiment since Martin had to do something for a client that wanted to use HTTP, interesting to see how fast is UDP compared to TCP, just left there for research reasons.
+
+**feature/json-v0.1** Only stored for historical reasons, it our first JSON + Brotli compressed protocol, that was tested and even though the limitations [proved to be quite fast](https://twitter.com/martinfasani/status/1166106095858966529).
+
 
 ## Test after compiling
 
@@ -52,7 +95,7 @@ UDP_PORT
 
 MQTT_ENABLE is set to false by default. Only required if you need to register the ESP32 in an external controller.
 
-    /lib/Output/Output.h
+    .pio/libdeps/BOARD/PIXELS/src/pixels.h
 
 The number of leds in the stripe: 
 
@@ -62,13 +105,19 @@ The data pin of the addressable leds:
 
 #define PIXELPIN 19
 
-This line will enable RGBW mode sending 4 bytes per pixel. Comment to use a RGB stripe in /lib/src/pixels/src/pixels.h
+Uncommenting this line will enable RGBW mode sending 4 bytes per pixel. It should be commented if you use RGB:
 
-#define RGBW
+    #define RGBW
+
+using RGB:
+
+    //#define RGBW
 
 **Note:** Using a RGB / RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp)
 
 ### History
+
+**2019-11** Martin worked out first a very raw Chrome App to send udp directly without middleware. This experiment lead to make a full pfledged [Android Application](http://udpx.fasani.de)
 
 **2019-06** Started working with Front-end developer [Hendrik Putzek](https://twitter.com/hputzek) to develop a firmware solution to transport a lot of frames per seconds from his Nodejs backend to a Led controller
 
@@ -77,6 +126,8 @@ This line will enable RGBW mode sending 4 bytes per pixel. Comment to use a RGB 
 **2019-08** [Samuel Archibald](https://twitter.com/IoTPanic) Made his first contribution and started a new protocol to get rid of JSON and send this even faster
 
 **2019-09** Tests and fixes to achieve a stable RGB, RGBW version
+
+**2019-10** Implementing and testing S library
 
 #### Old command line test
 
@@ -91,3 +142,10 @@ Should turn on some Leds provided netcat is installed on your system.
     cat examples/data-bin/72-pix-off.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
 
 Should turn off all leds in the 72 addressable led stripe. Use the 144-pix version to try this on 144 leds.
+
+### License
+
+This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
+
+It contains code and examples that can be used and copied freely for artistic works and it can be also used for commercial projects provided you write as a line to explain how is going to be used and our license and credits are maintained.
+We put really a lot of time and effort building this Firmware and we would like to give proffesional support to integrate it in the future.
