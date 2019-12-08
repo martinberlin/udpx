@@ -474,7 +474,7 @@ void setup()
 			readBTSerial();		
   		}
 		waitLoop++;
-		delay(1);
+		delay(1000);
 	}
 	preferences.begin("WiFiCred", false);
     //preferences.clear();
