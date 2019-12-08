@@ -460,13 +460,14 @@ void setup()
 
 	// Start Bluetooth serial
 	initBTSerial();
-	int waitms = 0;
-	while (waitms < BLE_WAIT_FOR_CONFIG) {
+	int waitLoop = 0;
+	delay(200);
+	while (waitLoop < BLE_WAIT_FOR_CONFIG) {
 		if (SerialBT.available() != 0) {
-			readBTSerial();
-			waitms++;
-			delay(1);
+			readBTSerial();		
   		}
+		waitLoop++;
+		delay(1);
 	}
 	preferences.begin("WiFiCred", false);
     //preferences.clear();
@@ -498,6 +499,7 @@ void setup()
 		// Check for available AP's
 		if (!scanWiFi()) {
 			Serial.println("Could not find any AP");
+			ESP.restart();
 		} else {
 			// If AP was found, start connection
 			connectWiFi();
