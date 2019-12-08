@@ -64,7 +64,7 @@ String ipAddress2String(const IPAddress& ipAddress){
 
 void timerCallback(){
   if (frameLastCounter != frameCounter) {
-    Serial.printf("FPS: %d Frames received: %d\n", frameCounter-frameLastCounter, frameCounter);
+    Serial.printf("FPS: %lu Frames received: %lu\n", frameCounter-frameLastCounter, frameCounter);
     frameLastCounter = frameCounter;
   } 
 }
@@ -92,12 +92,12 @@ void brTask(void * compressed){
       pix.receive(brOutBuffer, bufferLength);
 
     if (debugMode) {
-        Serial.printf("Neopixels:%d Brotli:%d Total:%d us\n", micros()-neoMs, brotliMs, micros()-initMs);
-        Serial.printf("Decompressed %d bytes for frame %d Heap %d\n", bufferLength, frameCounter, ESP.getFreeHeap());
+        Serial.printf("Neopixels: %lu Brotli: %lu Total: %d us\n", micros()-neoMs, brotliMs, micros()-initMs);
+        Serial.printf("Decompressed %lu bytes for frame %lu Heap %lu\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
       decompressionFailed++;
-      Serial.printf("Decompression failed %d times after frame: %d\n", decompressionFailed, frameCounter);
+      Serial.printf("Decompression failed %lu times after frame: %lu\n", decompressionFailed, frameCounter);
     }
     
     delete brOutBuffer;
@@ -222,7 +222,7 @@ bool scanWiFi() {
 	// Scan for AP
 	int apNum = WiFi.scanNetworks(false,true,false,1000);
 	if (apNum == 0) {
-		Serial.println("Found no networks?????");
+		Serial.println("Found no networks?");
 		return false;
 	}
 	
@@ -348,9 +348,12 @@ void readBTSerial() {
 			Serial.println("secondary SSID: "+ssidSec+" password: "+pwSec);
 			connStatusChanged = true;
 			hasCredentials = true;
-			
+			delay(500);
+
 			if (!scanWiFi()) {
 				Serial.println("Could not find any AP");
+				delay(500);
+				ESP.restart();
 			} else {
 				// If AP was found, start connection
 				connectWiFi();
@@ -457,7 +460,7 @@ void setup()
 
 	// Start Bluetooth serial
 	initBTSerial();
-	delay(9000);
+	delay(BLE_WAIT_FOR_CONFIG);
 	preferences.begin("WiFiCred", false);
     //preferences.clear();
 

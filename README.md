@@ -11,6 +11,54 @@ If you want to test this fast using Android, just download and install the udpx 
 
 The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
 
+### Configuring WiFi using Bluetooth
+
+Starting with version 1.1 defined in lib/Config.h the firmware supports receiving configuration over Bluetooth Serial. It waits BLE_WAIT_FOR_CONFIG miliseconds on every start.
+
+1.- Firmware boots, opens Bluetooth serial and waits for 9 seconds as default. Serial output:  
+
+    UDPX 1.1
+    BTSerial active. Device name: udpx-3C71BF9D53DC_1234
+
+2.- If in this time receives configuration it updates the SSID / Password and stores it on Preferences
+
+3.- If it does not, after the wait time, tries to connect to the last known access point.
+
+Serial output:
+
+    Start connection to AP_NAME
+    udpx-3C71BF9D53DC_1234.local is online
+    UDP Listening on: 
+    192.168.0.99:1234
+
+If a fast start without wait is desired the best would be to add a hardware button, that only when pressed will wait for configuration.
+
+### udpx Android application steps:
+
+1. Config Tab
+
+![step 1](/examples/udpx_android/screen-1.png)
+2. Select your device and accept the pair request
+
+![step 2](/examples/udpx_android/screen-2.png)
+3. Add your access point credentials
+
+![step 3](/examples/udpx_android/screen-3.png)
+4. Send config
+
+![step 4](/examples/udpx_android/screen-4.png)
+5. Go to antenna tab and click to set the IP
+
+![step 5](/examples/udpx_android/screen-5.png)
+6. Done! Ready to receive udpx pixels
+
+![step 6](/examples/udpx_android/screen-6.png)
+
+
+**Credits are due:** All logic doing the Firmware part is from [Bernd Giesecke](https://desire.giesecke.tk), since I followed his great example on ESP32WiFIBLE Android app, to make this configurable per Bluetooth serial. I implemented in a way that both [udpx Android](https://play.google.com/store/apps/details?id=io.cordova.udpx) and [ESP32 WiFi BLE](https://play.google.com/store/apps/details?id=tk.giesecke.esp32wifible) are supported. 
+The cool thing of Bernd implementation, is that credentials are being encoded while in my implementation is send in plain text, and also that supports setting up two AP if you need to use it on the go like home and your mobile AP. And in function scanWiFi is measuring the WiFi.RSSI of each access points in case both are matched, and connecting to the one that has better signal. 
+
+
 ### TEAM
 
 UDPX is a collaborative effort where a team of 3 have same access level to the repository:
@@ -25,12 +73,11 @@ UDPX is a collaborative effort where a team of 3 have same access level to the r
 
 **Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
 
-Both where developed by Samuel and are used by UDPX. This firmware a part of integrating this libraries has the MQTT part to register in Pixelpusher. Although all this is evolving and in the future they will be a [GO api](https://github.com/IoTPanic/pixelpusher) that may handle this part as well.
-
 Not on this branch: 
 **S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the udpx project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
 S is being currently tested and implemented in the **testing/s** branch of this repository.
 
+Both where developed by Samuel and are used by UDPX.
 
 ## Mission of this originally was
 

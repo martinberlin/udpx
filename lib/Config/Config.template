@@ -2,9 +2,13 @@
 #define DEBUG_MODE true
 #define UDPX_VERSION "1.1"
 
-// Only one of this two options should be enabled, either WIFI_BLE or WIFI_AP
+// How long will wait in SECONDS only with BLE open in setup()
+#define BLE_WAIT_FOR_CONFIG 9000
+
+// Only one of this two options should be enabled, either WIFI_BLE or WIFI_AP (But not at the same time please)
 // Enable WIFI_BLE to receive WiFi config over bluetooth
 #define WIFI_BLE
+
 // Enable WIFI_AP to use a fixed SSID /PASS
 //#define WIFI_AP
 
