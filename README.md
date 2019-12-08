@@ -2,14 +2,18 @@
 
 **udpx is a technology to transport data over WiFi to microcontrollers**
 
-### Android App latest builds
+### How to test this
 
+**Android App latest builds**
 If you want to test this fast using Android, just download and install the udpx app from Play store: 
 <a href="https://play.google.com/store/apps/details?id=io.cordova.udpx" />
 <img src="/examples/udpx-app-180x120.jpg" />
 [udpx esp32](https://play.google.com/store/apps/details?id=io.cordova.udpx)
 
 The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
+
+**Little stream protocol tester and nodejs libraries**
+https://github.com/hputzek/little-stream-protocol This will let you experience much better Framerate and it also supports S as a protocol with compression.
 
 ### Configuring WiFi using Bluetooth
 
@@ -56,8 +60,8 @@ If a fast start without wait is desired the best would be to add a hardware butt
 ![step 6](/examples/udpx_android/screen-5.png)
 
 
-**Credits are due:** All logic doing the Firmware part is from [Bernd Giesecke](https://desire.giesecke.tk), since I followed his great example on ESP32WiFIBLE Android app, to make this configurable per Bluetooth serial. I implemented in a way that both [udpx Android](https://play.google.com/store/apps/details?id=io.cordova.udpx) and [ESP32 WiFi BLE](https://play.google.com/store/apps/details?id=tk.giesecke.esp32wifible) are supported. 
-The cool thing of Bernd implementation, is that credentials are being encoded while in my implementation is send in plain text, and also that supports setting up two AP if you need to use it on the go like home and your mobile AP. And in function scanWiFi is measuring the WiFi.RSSI of each access points in case both are matched, and connecting to the one that has better signal. 
+**Credits are due:** All logic doing the Firmware part is from [Bernd Giesecke](https://desire.giesecke.tk), since I followed his great example on ESP32WiFIBLE Android app, to make this configurable per Bluetooth serial. I implemented in a way that both [udpx Android](https://play.google.com/store/apps/details?id=io.cordova.udpx) and [ESP32 WiFi BLE](https://play.google.com/store/apps/details?id=tk.giesecke.esp32wifible) as a WiFi configuration mean are supported. 
+Bernd implementation in Java can configure up to 2 APs in the ESP32 and in the Firmware side measures the WiFi.RSSI of each AP in case both are matched, and connecting to the one that has better signal. 
 
 
 ### TEAM
@@ -73,27 +77,16 @@ UDPX is a collaborative effort where a team of 3 have same access level to the r
 ## Additional libraries
 
 **Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
-
-Not on this branch: 
-**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the udpx project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes, S takes care of joining the data for you having a callback that get's called once it receives the last package.
+ 
+**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the udpx project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes.
 S is being currently tested and implemented in the **testing/s** branch of this repository.
 
 Both where developed by Samuel and are used by UDPX.
 
-## Mission of this originally was
-
-[Pixelpusher API](https://github.com/IoTPanic/pixelpusher) is a work in progress by IoTPanic that will use a DMX like architecture to control LEDS.
-UDPX represents the ESP32 firmware where this Protocols will be tested and implemented. It's a collaborative effort of a team of makers that like tinkering with Espressif microcontrollers. Is still a work in progress.
-
-## Testing the Firmware
-
-Although this repository has a **examples/test** where there is a small tester the official way to Test it is to use @hputzek NodeJs tester that is located in this Repository:
-
-https://github.com/hputzek/little-stream-protocol
-
-This will let you experience much better Framerate and it also supports S as a protocol. Among many fine adjust settings like Color it has aso a FPS slider where you can adjust speed and a nice preview. It's possible also to select between random output or "snake" animation for testing purposes.
 
 ## Branches
+
+**main** Supports Brotli compression when the first byte is not 'p' (80), is the only branch that has BTSerial configuration
 
 **develop** Main branch only with Pixels protocol. 
 DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
@@ -115,7 +108,7 @@ examples/test
     nodejs middleware.js 
     Send UDP packets to the ESP32 IP in both RGB / RGBW to certify it works, does not crash and fullfills expected behaviour.
 
-Please DO NOT merge in any stable branch before the tests pass. Keeping this methodology we will save the development team lot's of time that can be used wisely.
+Please DO NOT merge in any stable branch before the tests pass.
 
 ## Branching model
 
