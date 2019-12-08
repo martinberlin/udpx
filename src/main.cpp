@@ -7,7 +7,7 @@
 #include <SimpleTimer.h>
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
-
+#include <Preferences.h>
 #define BROTLI_DECOMPRESSION_BUFFER 3000
 TaskHandle_t brotliTask;
 size_t receivedLength;
@@ -25,7 +25,7 @@ bool hasCredentials = false;
 /** Connection status */
 volatile bool isConnected = false;
 bool connStatusChanged = false;
-
+uint8_t lostConnectionCount = 1;
 /** SSIDs of local WiFi networks */
 String ssidPrim;
 String ssidSec;
@@ -42,6 +42,7 @@ typedef struct {
   unsigned size;
   uint8_t *pyld;
 }taskParams;
+Preferences preferences; 
 
 String ipAddress2String(const IPAddress& ipAddress){
   return String(ipAddress[0]) + String(".") +\
@@ -54,7 +55,7 @@ String ipAddress2String(const IPAddress& ipAddress){
   #include <nvs.h>
   #include <nvs_flash.h>
   #include "BluetoothSerial.h"
-  #include <Preferences.h>
+
     // SerialBT class
   BluetoothSerial SerialBT;
 
@@ -159,16 +160,22 @@ void lostCon(system_event_id_t event) {
 	isConnected = false;
 	connStatusChanged = true;
 
-  Serial.println("WiFi lost connection, trying to connect again");
-	//ESP.restart();
+    Serial.printf("WiFi lost connection try %d to connect again\n", lostConnectionCount);
+	lostConnectionCount++;
+	// Avoid trying to connect forever if the user made a typo in password
+	if (lostConnectionCount>4) {
+		Serial.println("Clearing saved WiFi credentials");
+		preferences.begin("WiFiCred", false);
+		preferences.clear();
+		preferences.end();
+		delay(500);
+		ESP.restart();
+	}
 	WiFi.begin(ssidPrim.c_str(), pwPrim.c_str());
 }
 
-// Includes for Bluetooth Serial configuration
+// Bluetooth Serial configuration
 #ifdef WIFI_BLE
-
-  // WiFi credentials storage
-  Preferences preferences; 
   /**
  * Create unique device name from MAC address
  **/
