@@ -14,7 +14,7 @@ size_t receivedLength;
 TimerHandle_t wifiReconnectTimer;
 unsigned long frameCounter = 0;
 unsigned long frameLastCounter = frameCounter;
-long decompressionFailed = 0;
+unsigned long decompressionFailed = 0;
 // Debug mode prints to serial
 bool debugMode = DEBUG_MODE;
 // Please follow naming as SERVICE_PORT with an underscore (Android App needs this)
@@ -93,8 +93,8 @@ void brTask(void * compressed){
       pix.receive(brOutBuffer, bufferLength);
 
     if (debugMode) {
-        Serial.printf("Neopixels: %lu Brotli: %lu Total: %d us\n", micros()-neoMs, brotliMs, micros()-initMs);
-        Serial.printf("Decompressed %lu bytes for frame %lu Heap %lu\n", bufferLength, frameCounter, ESP.getFreeHeap());
+        Serial.printf("Neopixels: %lu Brotli: %lu Total: %lu us\n", micros()-neoMs, brotliMs, micros()-initMs);
+        Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
       decompressionFailed++;
@@ -316,7 +316,7 @@ void readBTSerial() {
 	SerialBT.flush();
 	Serial.println("Received message " + receivedData + " over Bluetooth");
 
-	// decode the message | No need to do this, since we receive it as string already
+	// Decode the message only if it comes encoded (Like ESP32 WIFI Ble does)
 	if (receivedData[0] != '{') {
 		int keyIndex = 0;
 		for (int index = 0; index < receivedData.length(); index ++) {
@@ -405,35 +405,6 @@ void readBTSerial() {
 				Serial.println("Cannot send IP request: Serial Bluetooth is not available");
 			}
 			
-		}
-		else if (jsonBuffer.containsKey("read"))
-		{ // {"read":"true"}
-			Serial.println("BTSerial read request");
-			String wifiCredentials;
-			jsonBuffer.clear();
-
-			/** Json object for outgoing data */
-			jsonBuffer.clear();
-			jsonBuffer["ssidPrim"] = ssidPrim;
-			jsonBuffer["pwPrim"] = pwPrim;
-			jsonBuffer["ssidSec"] = ssidSec;
-			jsonBuffer["pwSec"] = pwSec;
-			// Convert JSON object into a string
-			serializeJson(jsonBuffer, wifiCredentials);
-
-			// encode the data
-			int keyIndex = 0;
-			Serial.println("Stored settings: " + wifiCredentials);
-			for (int index = 0; index < wifiCredentials.length(); index ++) {
-				wifiCredentials[index] = (char) wifiCredentials[index] ^ (char) apName[keyIndex];
-				keyIndex++;
-				if (keyIndex >= strlen(apName)) keyIndex = 0;
-			}
-			Serial.println("Stored encrypted: " + wifiCredentials);
-
-			delay(2000);
-			SerialBT.print(wifiCredentials);
-			SerialBT.flush();
 		} else if (jsonBuffer.containsKey("reset")) {
 			WiFi.disconnect();
 			esp_restart();
