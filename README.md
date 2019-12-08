@@ -38,18 +38,19 @@ If a fast start without wait is desired the best would be to add a hardware butt
 1. Config Tab
 
 ![step 1](/examples/udpx_android/screen-1.png)
+
 2. Select your device and accept the pair request
 
 ![step 2](/examples/udpx_android/screen-2.png)
-3. Add your access point credentials
+
+3. Add your access point credentials and click Send config
 
 ![step 3](/examples/udpx_android/screen-3.png)
-4. Send config
 
-![step 4](/examples/udpx_android/screen-4.png)
 5. Go to antenna tab and click to set the IP
 
 ![step 5](/examples/udpx_android/screen-5.png)
+
 6. Done! Ready to receive udpx pixels
 
 ![step 6](/examples/udpx_android/screen-6.png)
