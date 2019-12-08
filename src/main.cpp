@@ -518,7 +518,7 @@ void loop() {
   timer.run();
 
   #ifdef WIFI_BLE
-  if (SerialBT.available() != 0 && !isConnected) {
+  if (SerialBT.available() != 0) {
 	readBTSerial();
   }
   #endif
