@@ -460,7 +460,14 @@ void setup()
 
 	// Start Bluetooth serial
 	initBTSerial();
-	delay(BLE_WAIT_FOR_CONFIG);
+	int waitms = 0;
+	while (waitms < BLE_WAIT_FOR_CONFIG) {
+		if (SerialBT.available() != 0) {
+			readBTSerial();
+			waitms++;
+			delay(1);
+  		}
+	}
 	preferences.begin("WiFiCred", false);
     //preferences.clear();
 
@@ -509,7 +516,7 @@ void loop() {
   timer.run();
 
   #ifdef WIFI_BLE
-  if (SerialBT.available() != 0) {
+  if (SerialBT.available() != 0 && !isConnected) {
 	readBTSerial();
   }
   #endif
