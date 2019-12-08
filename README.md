@@ -49,11 +49,11 @@ If a fast start without wait is desired the best would be to add a hardware butt
 
 5. Go to antenna tab and click to set the IP
 
-![step 5](/examples/udpx_android/screen-5.png)
+![step 5](/examples/udpx_android/screen-4.png)
 
 6. Done! Ready to receive udpx pixels
 
-![step 6](/examples/udpx_android/screen-6.png)
+![step 6](/examples/udpx_android/screen-5.png)
 
 
 **Credits are due:** All logic doing the Firmware part is from [Bernd Giesecke](https://desire.giesecke.tk), since I followed his great example on ESP32WiFIBLE Android app, to make this configurable per Bluetooth serial. I implemented in a way that both [udpx Android](https://play.google.com/store/apps/details?id=io.cordova.udpx) and [ESP32 WiFi BLE](https://play.google.com/store/apps/details?id=tk.giesecke.esp32wifible) are supported. 
