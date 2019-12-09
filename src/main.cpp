@@ -93,7 +93,7 @@ void brTask(void * compressed){
       pix.receive(brOutBuffer, bufferLength);
 
     if (debugMode) {
-        Serial.printf("Neopixels: %lu Brotli: %lu Total: %lu us\n", micros()-neoMs, brotliMs, micros()-initMs);
+        Serial.printf("Neopixels: %u Brotli: %lu Total: %u us\n", micros()-neoMs, brotliMs, micros()-initMs);
         Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
@@ -440,7 +440,7 @@ void setup()
 	initBTSerial();
 	int waitLoop = 0;
 	delay(200);
-	while (waitLoop < BLE_WAIT_FOR_CONFIG) {
+	while (waitLoop < BLE_SECONDS_WAIT_FOR_CONFIG) {
 		if (SerialBT.available() != 0) {
 			readBTSerial();		
   		}

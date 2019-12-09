@@ -17,7 +17,7 @@ https://github.com/hputzek/little-stream-protocol This will let you experience m
 
 ### Configuring WiFi using Bluetooth
 
-Starting with version 1.1 defined in lib/Config.h the firmware supports receiving configuration over Bluetooth Serial. It waits BLE_WAIT_FOR_CONFIG miliseconds on every start.
+Starting with version 1.1 defined in lib/Config.h the firmware supports receiving configuration over Bluetooth Serial. It waits BLE_SECONDS_WAIT_FOR_CONFIG on every start. If you want to make the start faster just set this to a low number.
 
 1.- Firmware boots, opens Bluetooth serial and waits for 9 seconds as default. Serial output:  
 
