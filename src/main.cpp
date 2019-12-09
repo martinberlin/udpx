@@ -60,7 +60,7 @@ String ipAddress2String(const IPAddress& ipAddress){
   BluetoothSerial SerialBT;
 
   /** Buffer for JSON string */
-  StaticJsonDocument<200> jsonBuffer;
+  StaticJsonDocument<1000> jsonBuffer;
 #endif
 
 void timerCallback(){
@@ -440,13 +440,7 @@ void setup()
 	initBTSerial();
 	int waitLoop = 0;
 	delay(200);
-	while (waitLoop < BLE_WAIT_FOR_CONFIG) {
-		if (SerialBT.available() != 0) {
-			readBTSerial();		
-  		}
-		waitLoop++;
-		delay(1);
-	}
+	
 	preferences.begin("WiFiCred", false);
     //preferences.clear();
 
