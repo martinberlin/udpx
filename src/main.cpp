@@ -8,7 +8,7 @@
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
-#include <rom/miniz.h>
+#include <miniz.c>
 
 // tdefl_compressor contains all the state needed by the low-level compressor so it's a pretty big struct (~300k).
 // This example makes it a global vs. putting it on the stack, of course in real-world usage you'll probably malloc() or new it.
@@ -77,59 +77,28 @@ void timerCallback(){
 
 String miniz_last_error = "";
 
-void minizTask(void *data_buf) {
+void minizTask(void *compressed) {
   Serial.printf("Decompressing gzip\n");
+  unsigned char*outBuffer = new unsigned char[BROTLI_DECOMPRESSION_BUFFER];
+  int total_succeeded;
+  mz_ulong uncomp_len;
+  int cmp_status = uncompress(outBuffer, &uncomp_len, (const unsigned char*)compressed, receivedLength);
+  total_succeeded += (cmp_status == Z_OK);
 
-  static uint8_t out_buf[BROTLI_DECOMPRESSION_BUFFER];
-  static uint8_t *next_out = out_buf;
-  size_t remaining_compressed = receivedLength;
-  int status = TINFL_STATUS_NEEDS_MORE_INPUT;
+// Return status codes. MZ_PARAM_ERROR is non-standard.
+//enum { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
 
-  while(receivedLength > 0 && status > TINFL_STATUS_DONE) {
-    size_t in_bytes = receivedLength; /* input remaining */
-    size_t out_bytes = out_buf + sizeof(out_buf) - next_out; /* output space remaining */
-    int flags = TINFL_FLAG_PARSE_ZLIB_HEADER;
+  Serial.printf("MZ_OK=0 MZ_status:%d out_length:%d total_succeeded:%d\n",cmp_status,uncomp_len,total_succeeded);
 
-    if(remaining_compressed > receivedLength) {
-      flags |= TINFL_FLAG_HAS_MORE_INPUT;
-    } 
-
-    status = tinfl_decompress(&decompressor, (const uint8_t *)data_buf, &in_bytes,
-                     out_buf, next_out, &out_bytes,
-                     flags);
-
-    remaining_compressed -= in_bytes;
-    receivedLength -= in_bytes;
-    data_buf += in_bytes;
-
-    next_out += out_bytes;
-    size_t bytes_in_out_buf = next_out - out_buf;
-    if (status <= TINFL_STATUS_DONE || bytes_in_out_buf == sizeof(out_buf)) {
-      // Output buffer full, or done
-      Serial.printf("Decompressed %d bytes", out_bytes);
-	for (size_t i = 0; i < out_bytes; i++)
-        {
-          Serial.print(out_buf[i], HEX);
-          Serial.print(" ");
-        }
-      next_out = out_buf;
-	      vTaskDelete(NULL);
-    }
-  } // while
-
-  if (status < TINFL_STATUS_DONE) {
-    /* error won't get sent back to esptool.py until next block is sent */
-    miniz_last_error = "ESP_INFLATE_ERROR";
-  }
-  // && fs.remaining > 0
-  if (status == TINFL_STATUS_DONE) {
-    miniz_last_error = "ESP_NOT_ENOUGH_DATA";
-  }
-  // && fs.remaining == 0
-  if (status != TINFL_STATUS_DONE) {
-    miniz_last_error = "ESP_TOO_MUCH_DATA";
-  }
-  Serial.println(miniz_last_error);
+  if (false) {
+	for (size_t i = 0; uncomp_len < 8; i++)
+	{
+		Serial.print(outBuffer[i], HEX);
+		Serial.print(" ");
+	}
+	}
+	delete outBuffer;
+    vTaskDelete(NULL);
 }
 
 // Task sent to the core to decompress + push to Output
