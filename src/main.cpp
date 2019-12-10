@@ -125,8 +125,8 @@ void brTask(void * compressed){
       pix.receive(brOutBuffer, bufferLength);
 
     if (debugMode) {
-        Serial.printf("Neopixels: %lu Brotli: %lu Total: %d us\n", micros()-neoMs, brotliMs, micros()-initMs);
-        Serial.printf("Decompressed %lu bytes for frame %lu Heap %lu\n", bufferLength, frameCounter, ESP.getFreeHeap());
+        Serial.printf("Neopixels: %u Brotli: %lu Total: %u us\n", micros()-neoMs, brotliMs, micros()-initMs);
+        Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
       decompressionFailed++;
