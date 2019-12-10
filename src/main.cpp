@@ -78,9 +78,11 @@ void timerCallback(){
 String miniz_last_error = "";
 
 void minizTask(void *data_buf) {
-  static uint8_t out_buf[32768];
+  Serial.printf("Decompressing gzip\n");
+
+  static uint8_t out_buf[BROTLI_DECOMPRESSION_BUFFER];
   static uint8_t *next_out = out_buf;
-  size_t remaining_compressed;
+  size_t remaining_compressed = receivedLength;
   int status = TINFL_STATUS_NEEDS_MORE_INPUT;
 
   while(receivedLength > 0 && status > TINFL_STATUS_DONE) {
@@ -104,8 +106,8 @@ void minizTask(void *data_buf) {
     size_t bytes_in_out_buf = next_out - out_buf;
     if (status <= TINFL_STATUS_DONE || bytes_in_out_buf == sizeof(out_buf)) {
       // Output buffer full, or done
-      Serial.println("Decompressed:");
-	for (size_t i = 0; i < bytes_in_out_buf; i++)
+      Serial.printf("Decompressed %d bytes", out_bytes);
+	for (size_t i = 0; i < out_bytes; i++)
         {
           Serial.print(out_buf[i], HEX);
           Serial.print(" ");
@@ -191,28 +193,40 @@ void gotIP(system_event_id_t event) {
 
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
-		Serial.println("First BYTE: ");
-        Serial.println((int) packet.data()[0]);
-
-        if ((int) packet.data()[0] == 80) {
-        // Non compressed
-          pix.receive(packet.data(), packet.length());
-		  frameCounter++;
-        } else {
-			
-          receivedLength = packet.length();
-		  Serial.printf("Decompressing %d bytes", receivedLength);
-		  //brTask
-          xTaskCreatePinnedToCore(
+		receivedLength = packet.length();
+		Serial.printf("First BYTE:%d b[1]+b[2]:%d of %d bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
+        
+		switch (packet.data()[0]+packet.data()[1])
+		{
+		case 80:
+			/* Not compressed */
+			pix.receive(packet.data(), packet.length());
+			frameCounter++;
+			break;
+		case 170:
+			/* GZIP compressed */
+			xTaskCreatePinnedToCore(
                     minizTask,        
-                    "uncompress", 
-                    100000,         
+                    "uncompressGZ", 
+                    20000,         
                     packet.data(),   
                     9,            
                     &brotliTask,  
-                    0);           
-          delay(2);  
-        }
+                    0);
+			break;
+		
+		default:
+		    /* BROTLI compressed */
+            xTaskCreatePinnedToCore(
+                    brTask,        
+                    "uncompressBR", 
+                    10000,         
+                    packet.data(),   
+                    9,            
+                    &brotliTask,  
+                    0);
+			break;
+		}
 
         }); 
  
