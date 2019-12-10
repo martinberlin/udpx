@@ -8,6 +8,11 @@
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
+#include <rom/miniz.h>
+
+// tdefl_compressor contains all the state needed by the low-level compressor so it's a pretty big struct (~300k).
+// This example makes it a global vs. putting it on the stack, of course in real-world usage you'll probably malloc() or new it.
+tinfl_decompressor decompressor;
 #define BROTLI_DECOMPRESSION_BUFFER 3000
 TaskHandle_t brotliTask;
 size_t receivedLength;
@@ -69,6 +74,61 @@ void timerCallback(){
     frameLastCounter = frameCounter;
   } 
 }
+
+String miniz_last_error = "";
+
+void minizTask(void *data_buf) {
+  static uint8_t out_buf[32768];
+  static uint8_t *next_out = out_buf;
+  size_t remaining_compressed;
+  int status = TINFL_STATUS_NEEDS_MORE_INPUT;
+
+  while(receivedLength > 0 && status > TINFL_STATUS_DONE) {
+    size_t in_bytes = receivedLength; /* input remaining */
+    size_t out_bytes = out_buf + sizeof(out_buf) - next_out; /* output space remaining */
+    int flags = TINFL_FLAG_PARSE_ZLIB_HEADER;
+
+    /* if(fs.remaining_compressed > length) {
+      flags |= TINFL_FLAG_HAS_MORE_INPUT;
+    } */
+
+    status = tinfl_decompress(&decompressor, (const uint8_t *)data_buf, &in_bytes,
+                     out_buf, next_out, &out_bytes,
+                     flags);
+
+    remaining_compressed -= in_bytes;
+    receivedLength -= in_bytes;
+    data_buf += in_bytes;
+
+    next_out += out_bytes;
+    size_t bytes_in_out_buf = next_out - out_buf;
+    if (status <= TINFL_STATUS_DONE || bytes_in_out_buf == sizeof(out_buf)) {
+      // Output buffer full, or done
+      //handle_flash_data(out_buf, bytes_in_out_buf);
+	for (size_t i = 0; i < bytes_in_out_buf; i++)
+        {
+          Serial.print(out_buf[i], HEX);
+          Serial.print(" ");
+        }
+      next_out = out_buf;
+    }
+  } // while
+
+  if (status < TINFL_STATUS_DONE) {
+    /* error won't get sent back to esptool.py until next block is sent */
+    miniz_last_error = "ESP_INFLATE_ERROR";
+  }
+  // && fs.remaining > 0
+  if (status == TINFL_STATUS_DONE) {
+    miniz_last_error = "ESP_NOT_ENOUGH_DATA";
+  }
+  // && fs.remaining == 0
+  if (status != TINFL_STATUS_DONE) {
+    miniz_last_error = "ESP_TOO_MUCH_DATA";
+  }
+  Serial.println(miniz_last_error);
+}
+
 // Task sent to the core to decompress + push to Output
 void brTask(void * compressed){  
   
@@ -130,15 +190,18 @@ void gotIP(system_event_id_t event) {
 
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
-      
+		Serial.print('First BYTE: ');
+        Serial.println(packet.data()[0]);
+
         if ((int) packet.data()[0] == 80) {
         // Non compressed
           pix.receive(packet.data(), packet.length());
 		  frameCounter++;
         } else {
           receivedLength = packet.length();
+		  //brTask
           xTaskCreatePinnedToCore(
-                    brTask,        
+                    minizTask,        
                     "uncompress", 
                     10000,         
                     packet.data(),   
@@ -460,6 +523,7 @@ void setup()
 {
   Serial.begin(115200);
   pix.init();
+
   Serial.printf("UDPX %s\n", UDPX_VERSION); 
 
   #ifdef WIFI_BLE
@@ -469,7 +533,7 @@ void setup()
 	initBTSerial();
 	int waitLoop = 0;
 	delay(200);
-	while (waitLoop < BLE_WAIT_FOR_CONFIG) {
+	while (waitLoop < BLE_SECONDS_WAIT_FOR_CONFIG) {
 		if (SerialBT.available() != 0) {
 			readBTSerial();		
   		}
@@ -503,14 +567,14 @@ void setup()
 	preferences.end();
 
 	if (hasCredentials) {
+		connectWiFi();
 		// Check for available AP's
-		if (!scanWiFi()) {
+		/* if (!scanWiFi()) {
 			Serial.println("Could not find any AP");
-			ESP.restart();
 		} else {
 			// If AP was found, start connection
 			connectWiFi();
-		}
+		} */
 	}
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
