@@ -88,9 +88,9 @@ void minizTask(void *data_buf) {
     size_t out_bytes = out_buf + sizeof(out_buf) - next_out; /* output space remaining */
     int flags = TINFL_FLAG_PARSE_ZLIB_HEADER;
 
-    /* if(fs.remaining_compressed > length) {
+    if(remaining_compressed > receivedLength) {
       flags |= TINFL_FLAG_HAS_MORE_INPUT;
-    } */
+    } 
 
     status = tinfl_decompress(&decompressor, (const uint8_t *)data_buf, &in_bytes,
                      out_buf, next_out, &out_bytes,
@@ -104,13 +104,14 @@ void minizTask(void *data_buf) {
     size_t bytes_in_out_buf = next_out - out_buf;
     if (status <= TINFL_STATUS_DONE || bytes_in_out_buf == sizeof(out_buf)) {
       // Output buffer full, or done
-      //handle_flash_data(out_buf, bytes_in_out_buf);
+      Serial.println("Decompressed:");
 	for (size_t i = 0; i < bytes_in_out_buf; i++)
         {
           Serial.print(out_buf[i], HEX);
           Serial.print(" ");
         }
       next_out = out_buf;
+	      vTaskDelete(NULL);
     }
   } // while
 
@@ -190,20 +191,22 @@ void gotIP(system_event_id_t event) {
 
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
-		Serial.print('First BYTE: ');
-        Serial.println(packet.data()[0]);
+		Serial.println("First BYTE: ");
+        Serial.println((int) packet.data()[0]);
 
         if ((int) packet.data()[0] == 80) {
         // Non compressed
           pix.receive(packet.data(), packet.length());
 		  frameCounter++;
         } else {
+			
           receivedLength = packet.length();
+		  Serial.printf("Decompressing %d bytes", receivedLength);
 		  //brTask
           xTaskCreatePinnedToCore(
                     minizTask,        
                     "uncompress", 
-                    10000,         
+                    100000,         
                     packet.data(),   
                     9,            
                     &brotliTask,  
