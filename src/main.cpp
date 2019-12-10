@@ -15,7 +15,7 @@
 tinfl_decompressor decompressor;
 #define BROTLI_DECOMPRESSION_BUFFER 3000
 TaskHandle_t brotliTask;
-size_t receivedLength;
+uLong receivedLength;
 TimerHandle_t wifiReconnectTimer;
 unsigned long frameCounter = 0;
 unsigned long frameLastCounter = frameCounter;
@@ -78,17 +78,20 @@ void timerCallback(){
 String miniz_last_error = "";
 
 void minizTask(void *compressed) {
-  Serial.printf("Decompressing gzip\n");
-  unsigned char*outBuffer = new unsigned char[BROTLI_DECOMPRESSION_BUFFER];
-  int total_succeeded;
-  mz_ulong uncomp_len;
-  int cmp_status = uncompress(outBuffer, &uncomp_len, (const unsigned char*)compressed, receivedLength);
-  total_succeeded += (cmp_status == Z_OK);
+  Serial.printf("Decompressing gzip. Received: %d bytes\n", receivedLength);
+  uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
+  uLong uncomp_len;
+  
+  int cmp_status = uncompress(
+	  outBuffer, 
+	  &uncomp_len, 
+  	  (const unsigned char*)compressed, 
+      receivedLength);
 
-// Return status codes. MZ_PARAM_ERROR is non-standard.
 //enum { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
 
-  Serial.printf("MZ_OK=0 MZ_status:%d out_length:%d total_succeeded:%d\n",cmp_status,uncomp_len,total_succeeded);
+  Serial.printf("MZ_OK=0 MZ_status:%d out_length:%lu uncomp_length:%lu\n",
+  cmp_status,uncomp_len,uncomp_len);
 
   if (false) {
 	for (size_t i = 0; uncomp_len < 8; i++)
