@@ -175,7 +175,7 @@ void gotIP(system_event_id_t event) {
 			pix.receive(packet.data(), packet.length());
 			frameCounter++;
 			break;
-		case 170:
+		case 121:
 			/* GZIP compressed */
 			xTaskCreatePinnedToCore(
                     minizTask,        
