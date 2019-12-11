@@ -171,25 +171,48 @@ void gotIP(system_event_id_t event) {
 		switch (packet.data()[0]+packet.data()[1])
 		{
 		case 80:
+		{
 			/* Not compressed */
 			pix.receive(packet.data(), packet.length());
 			frameCounter++;
 			break;
+		}
 		case 121:
-			/* GZIP compressed */
-			xTaskCreatePinnedToCore(
-                    minizTask,        
-                    "uncompressGZ", 
-                    20000,         
-                    packet.data(),   
-                    9,            
-                    &brotliTask,  
-                    0);
-			break;
+		{
+			/* GZIP miniz c file_in file_out */
+		    
+			uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
+			uLong uncomp_len;
+			
+			int cmp_status = uncompress(
+				outBuffer, 
+				&uncomp_len, 
+				(const unsigned char*)packet.data(), 
+				packet.length());
+			// status:
+			// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
+			Serial.printf
+			("Status:%d Decompressing miniz. Received: %d bytes, uncomp_length:%lu\n",
+			cmp_status, packet.length(), uncomp_len);
+
+			if (cmp_status == 0) {
+				pix.receive(outBuffer, uncomp_len);
+				frameCounter++;
+				if (DEBUG_MODE) {
+					Serial.println("HEX decompression dump");
+					for (size_t i = 0; i<=uncomp_len; i++){
+						Serial.print(outBuffer[i], HEX);
+						Serial.print(" ");
+					}
+				}	
+			}
+			delete outBuffer;
+		}
+		break;
 		
 		default:
-		    /* BROTLI compressed */
-            xTaskCreatePinnedToCore(
+        {
+			xTaskCreatePinnedToCore(
                     brTask,        
                     "uncompressBR", 
                     10000,         
@@ -198,6 +221,7 @@ void gotIP(system_event_id_t event) {
                     &brotliTask,  
                     0);
 			break;
+		}
 		}
 
         }); 
