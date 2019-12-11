@@ -9,10 +9,7 @@
 // Enable WIFI_BLE to receive WiFi config over bluetooth
 #define WIFI_BLE
 
-// Enable WIFI_AP to use a fixed SSID /PASS
-//#define WIFI_AP
-
-// If WIFI_AP is selected then
+// Comment out WIFI_BLE to use a fixed SSID /PASS and define it:
 #define WIFI_SSID "KabelBox-A210"
 #define WIFI_PASS ""
 

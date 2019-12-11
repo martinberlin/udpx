@@ -1,0 +1,5 @@
+To send UDP from linux command line:
+
+cat 72-on.z |nc -w1 -u 192.168.IP 1234
+
+Same for br Brotli compressed or plain binary (.bin)

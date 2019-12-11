@@ -10,9 +10,6 @@
 #include <Preferences.h>
 #include <miniz.c>
 
-// tdefl_compressor contains all the state needed by the low-level compressor so it's a pretty big struct (~300k).
-// This example makes it a global vs. putting it on the stack, of course in real-world usage you'll probably malloc() or new it.
-tinfl_decompressor decompressor;
 #define BROTLI_DECOMPRESSION_BUFFER 3000
 TaskHandle_t brotliTask;
 uLong receivedLength;
@@ -75,35 +72,6 @@ void timerCallback(){
   } 
 }
 
-String miniz_last_error = "";
-
-void minizTask(void *compressed) {
-  Serial.printf("Decompressing gzip. Received: %d bytes\n", receivedLength);
-  uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
-  uLong uncomp_len;
-  
-  int cmp_status = uncompress(
-	  outBuffer, 
-	  &uncomp_len, 
-  	  (const unsigned char*)compressed, 
-      receivedLength);
-
-//enum { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
-
-  Serial.printf("MZ_OK=0 MZ_status:%d out_length:%lu uncomp_length:%lu\n",
-  cmp_status,uncomp_len,uncomp_len);
-
-  if (false) {
-	for (size_t i = 0; uncomp_len < 8; i++)
-	{
-		Serial.print(outBuffer[i], HEX);
-		Serial.print(" ");
-	}
-	}
-	delete outBuffer;
-    vTaskDelete(NULL);
-}
-
 // Task sent to the core to decompress + push to Output
 void brTask(void * compressed){  
   
@@ -128,7 +96,7 @@ void brTask(void * compressed){
       pix.receive(brOutBuffer, bufferLength);
 
     if (debugMode) {
-        Serial.printf("Neopixels: %u Brotli: %lu Total: %u us\n", micros()-neoMs, brotliMs, micros()-initMs);
+        Serial.printf("Neopixels: %d Brotli: %d Total: %d us\n", micros()-neoMs, brotliMs, micros()-initMs);
         Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
@@ -139,6 +107,7 @@ void brTask(void * compressed){
     delete brOutBuffer;
     vTaskDelete(NULL);
 }
+
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
@@ -180,7 +149,7 @@ void gotIP(system_event_id_t event) {
 		case 121:
 		{
 			/* GZIP miniz c file_in file_out */
-		    
+		    int initMs = micros();
 			uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
 			uLong uncomp_len;
 			
@@ -189,22 +158,24 @@ void gotIP(system_event_id_t event) {
 				&uncomp_len, 
 				(const unsigned char*)packet.data(), 
 				packet.length());
-			// status:
-			// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
-			Serial.printf
-			("Status:%d Decompressing miniz. Received: %d bytes, uncomp_length:%lu\n",
-			cmp_status, packet.length(), uncomp_len);
-
+			
 			if (cmp_status == 0) {
 				pix.receive(outBuffer, uncomp_len);
 				frameCounter++;
-				if (DEBUG_MODE) {
-					Serial.println("HEX decompression dump");
-					for (size_t i = 0; i<=uncomp_len; i++){
-						Serial.print(outBuffer[i], HEX);
-						Serial.print(" ");
-					}
 				}	
+			if (DEBUG_MODE) {
+				Serial.println("HEX decompression dump");
+				for (size_t i = 0; i<=uncomp_len; i++){
+					Serial.print(outBuffer[i], HEX);
+					Serial.print(" ");
+				}
+
+				// status:
+				// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
+				int uncompressMs = micros()-initMs;
+				Serial.printf
+				("\nStatus:%d Decompressing miniz in %d us. Received: %d bytes, uncomp_length:%lu\n",
+				cmp_status, uncompressMs, packet.length(), uncomp_len);
 			}
 			delete outBuffer;
 		}
@@ -249,9 +220,6 @@ void lostCon(system_event_id_t event) {
 	}
 	WiFi.begin(ssidPrim.c_str(), pwPrim.c_str());
 }
-
-// Bluetooth Serial configuration
-#ifdef WIFI_BLE
   /**
  * Create unique device name from MAC address
  **/
@@ -262,7 +230,8 @@ void createName() {
 	// Write unique name into apName
 	sprintf(apName, "udpx-%02X%02X%02X%02X%02X%02X_%d", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5], UDP_PORT);
 }
-
+// Bluetooth Serial configuration
+#ifdef WIFI_BLE
 /**
  * initBTSerial
  * Initialize Bluetooth Serial
@@ -379,6 +348,7 @@ void connectWiFi() {
  * parse data for valid WiFi credentials
  */
 void readBTSerial() {
+	if (!SerialBT.available()) return;
 	uint64_t startTimeOut = millis();
 	String receivedData;
 	int msgSize = 0;
@@ -538,18 +508,15 @@ void setup()
   pix.init();
 
   Serial.printf("UDPX %s\n", UDPX_VERSION); 
+  createName();
 
   #ifdef WIFI_BLE
-  	createName();
-
 	// Start Bluetooth serial
 	initBTSerial();
 	int waitLoop = 0;
 	delay(200);
 	while (waitLoop < BLE_SECONDS_WAIT_FOR_CONFIG) {
-		if (SerialBT.available() != 0) {
-			readBTSerial();		
-  		}
+		readBTSerial();		
 		waitLoop++;
 		delay(1000);
 	}
@@ -602,8 +569,6 @@ void loop() {
   timer.run();
 
   #ifdef WIFI_BLE
-  if (SerialBT.available() != 0) {
 	readBTSerial();
-  }
   #endif
 }
