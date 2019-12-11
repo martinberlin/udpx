@@ -1,0 +1,60 @@
+
+.container {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', Helvetica, sans-serif;
+    letter-spacing: 0.15em;
+}
+
+#udpx {
+    margin-left:-8px;
+}
+
+.video-container {
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%; 
+    overflow: hidden;
+}
+
+.video-container video {
+    /* Make video to at least 100% wide and tall */
+    min-width: 100%; 
+    min-height: auto; 
+
+    /* Setting width & height to auto prevents the browser from stretching or squishing the video */
+    width: 50%;
+    height: auto;
+}
+
+#videofile {
+    margin-top: 8px;
+}
+
+#c {
+    margin-top: 8px;
+    position: absolute;
+    width: 88px;
+    height: 44px;
+}
+
+#settings-spacer {
+    margin-top:10px
+}
+#settings-container {
+    margin-top:10px
+}
+/* Info message */
+#transmission {
+    font-size: 0.8em;
+}
+.white {
+    background-color: white;
+}
+
+.info {
+    background-color: #11df60;            
+}
+
+.error {
+    background-color: red;
+}

@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "udpx video to esp32",
+  "short_name": "udpx video",
+  "description": "Video is rendered to canvas and send via UDP pixels protocol to addressable Leds",
+  "version": "0.2.0",
+  "minimum_chrome_version": "33",
+  "permissions": [
+    "http://*/*",
+    "storage"
+  ],
+  "app": {
+    "background": {
+      "scripts": [
+        "js/main.js"
+      ]
+    }
+  },
+  "icons": { 
+    "16": "assets/udpx-icon-16.png",
+    "32": "assets/udpx-icon-32.png",
+    "48": "assets/udpx-icon-48.png",
+    "64": "assets/udpx-icon-64.png",
+   "128": "assets/udpx-icon-128.png" 
+  },
+  "sockets": {
+    "udp": {
+      "send": ["*"],
+      "bind": ["*"]
+    }
+  }
+}
