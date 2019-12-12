@@ -50,7 +50,7 @@
                             <label for="protocol" class="col-form-label">Protocol</label>
                             <select id="protocol" class="form-control form-control-sm">
                                 <option value="pixels">Pixels</option>
-                                <!-- <option value="pixzip">Pixels ZIP</option> -->
+                                <option value="pixzlib">PIXZlib</option>
                                 <option value="pixbro">Pixels Brotli</option>
                                 <option value="rgb888">RGB888</option>
                                 <option value="bro888">BRO888</option>
@@ -133,7 +133,8 @@
         <script src="js/jquery.min.js"></script>
         <script src="js/brotli-wasm.js"></script>
         <script src="js/brotli-bootstrap.js"></script>
-        <script src="js/miniz-bootstrap.js"></script>
+        <!-- Integrating this here to test it before Android-->
+        <!-- <script src="js/miniz/wasm_flate.js"></script> -->
         <script type="text/javascript" src="js/chromeapp-canvas.js"></script>
 </body>
 

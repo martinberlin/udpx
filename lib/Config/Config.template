@@ -1,6 +1,6 @@
 // Configuration
 #define DEBUG_MODE true
-#define UDPX_VERSION "1.1"
+#define UDPX_VERSION "1.2"
 
 // How long will wait in SECONDS only with BLE open in setup()
 #define BLE_WAIT_FOR_CONFIG 9

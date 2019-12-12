@@ -1,4 +1,20 @@
 let minizBase = 'js/miniz/';
+function fetchLocal(url) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest
+    xhr.responseType = "arraybuffer";
+    xhr.onload = function() {
+      resolve(new Response(new Uint8Array(xhr.response), {status: xhr.status}))
+    }
+    xhr.onerror = function() {
+      reject(new TypeError('Local request failed'))
+    }
+    xhr.open('GET', url)
+    xhr.send(null)
+  })
+}
+/* start of flate-wasm loader */
+
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// install a JSONP callback for chunk loading
 /******/ 	function webpackJsonpCallback(data) {
@@ -44,7 +60,7 @@ let minizBase = 'js/miniz/';
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "" + chunkId + ".bootstrap.js"
+/******/ 		return __webpack_require__.p + chunkId + ".bootstrap.js"
 /******/ 	}
 /******/
 /******/ 	// object to store loaded and loading wasm modules
@@ -225,8 +241,8 @@ let minizBase = 'js/miniz/';
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	//__webpack_require__.p = "https://unpkg.com/wasm-flate@0.1.11-alpha/dist/";
-/******/  __webpack_require__.p = minizBase;
+/******/ 	__webpack_require__.p = minizBase;
+/******/
 /******/ 	// on error function for async loading
 /******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
 /******/
@@ -237,7 +253,10 @@ let minizBase = 'js/miniz/';
 /******/ 	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
 /******/ 	jsonpArray.push = webpackJsonpCallback;
 /******/ 	jsonpArray = jsonpArray.slice();
-/******/ 	for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
+/******/ 	for(var i = 0; i < jsonpArray.length; i++) {
+            webpackJsonpCallback(jsonpArray[i]);
+            console.log(jsonpArray[i])
+          }
 /******/ 	var parentJsonpFunction = oldJsonpFunction;
 /******/
 /******/
@@ -253,13 +272,9 @@ let minizBase = 'js/miniz/';
   \**********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
-
-Promise.all(/*! import() */
-[__webpack_require__.e(0), __webpack_require__.e(1)])
-.then(__webpack_require__.t.bind(
-  null, "./index.js", 7))
-  .catch(e => console.error("Error importing `index.js`:", e));
-  //# sourceURL=webpack:///./bootstrap.js?");
- })
-
-/******/ });
+  Promise.all([__webpack_require__.e(0), __webpack_require__.e(1)])
+       .then(console.log('no static exports found'))
+       .catch(e => console.error("Error importing `index.js`:", e));
+  /***/ })
+  
+  /******/ });
