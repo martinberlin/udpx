@@ -122,9 +122,10 @@ function sendUdp(bytesToPost) {
         case 'pixzlib':
             compressed = flate.zlib_encode_raw(bytesToPost);
             t1 = performance.now();
-            chrome.sockets.udp.send(socketId, compressed, ip.value, parseInt(port.value), function(sendInfo) {
+            console.log("Implementing this")
+            /* chrome.sockets.udp.send(socketId, compressed, ip.value, parseInt(port.value), function(sendInfo) {
                     transmission.innerText = "Zlib took "+Math.round(t1-t0)+" ms. sent "+bytesToPost.length+"/"+sendInfo.bytesSent+" bro compressed bytes ";
-            });
+            }); */
         break;
         default:
             chrome.sockets.udp.send(socketId, bytesToPost, ip.value, parseInt(port.value), function(sendInfo) {
