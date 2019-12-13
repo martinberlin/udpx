@@ -96,7 +96,7 @@ void brTask(void * compressed){
       pix.receive(brOutBuffer, bufferLength);
 
     if (debugMode) {
-        Serial.printf("Neopixels: %d Brotli: %d Total: %d us\n", micros()-neoMs, brotliMs, micros()-initMs);
+        Serial.printf("Neopixels: %lu Brotli: %d Total: %lu us\n", micros()-neoMs, brotliMs, micros()-initMs);
         Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
@@ -135,7 +135,7 @@ void gotIP(system_event_id_t event) {
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
-		Serial.printf("First BYTE:%d b[1]+b[2]:%d of %d bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
+		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
         
 		switch (packet.data()[0]+packet.data()[1])
 		{
