@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>udpx Video to esp32</title>
+    <link rel="stylesheet" type="text/css" href="./assets/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./assets/style-chromeapp.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img id="udpx" src="./assets/udpx-logo.png">
+                    </div>
+            
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 video-container">
+                        <video id="video" class="video" src="video/01.mp4" controls></video>
+                        <input type="file" id="videofile" class="form-control form-control-sm" accept="video/*" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <div id="transmission"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8" id="settings-container">
+                <form id="main-form">
+
+                <div class="form-group row">
+                    <div class="col-xs-5">
+                        <label for="esp32_ip" class="col-form-label"><b>Espressif IP</b></label>
+                        <input id="esp32_ip" name="esp32_ip" type="text" class="col-xs-10 form-control form-control-sm" maxlength="15"
+                              value="192.168.0.88">
+                    </div>
+                    <div class="col-xs-3">
+                        <label for="udp_port" class="col-form-label">Port</label>
+                        <input id="udp_port" name="udp_port" type="text" class="form-control form-control-sm" maxlength="5" size="5"
+                               value="1234">
+                    </div>
+                    <div class="col-xs-4">
+                            <label for="protocol" class="col-form-label">Protocol</label>
+                            <select id="protocol" class="form-control form-control-sm">
+                                <option value="pixels">Pixels</option>
+                                <option value="pixzlib">PIXZlib</option>
+                                <option value="pixbro">Pixels Brotli</option>
+                                <option value="rgb888">RGB888</option>
+                                <option value="bro888">BRO888</option>
+                            </select>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-xs-4">
+                        <label for="v_width">Pix.width</label>
+                        <input id="v_width" name="v_width"  type="number" class="form-control form-control-sm" maxlength="3" value="44"
+                            required>
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="v_height">heigth</label>
+                        <input id="v_height" name="v_height" type="number" class="form-control form-control-sm" maxlength="3" value="11"
+                            required>
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="v_units">units &#9636;</label>
+                        <input id="v_units" name="v_units" type="number" class="form-control form-control-sm" maxlength="1" value="1"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                        <div class="col-xs-4">
+                            <label for="video_select">Video settings</label>
+                        <select id="video_select" class="form-control form-control-sm">
+                            <option value="">Select test video</option>
+                            <option value="01.mp4">Screen-test</option>
+                            <option value="02.mp4">Fading colors RGB</option>
+                            <option value="04.mp4">5,4,3 TV sample</option>
+                            <option value="05.mp4">05 Typography</option>
+                            <option value="cola1.mp4">Coca-cola 1</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="v_contrast">contrast</label>
+                        <input id="v_contrast" name="v_contrast" type="text" class="form-control form-control-sm"
+                            maxlength="3" size="3" value="1.4" required>
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="v_brightness">brightness * N</label>
+                        <input id="v_brightness" name="v_brightness" type="number" class="form-control form-control-sm"
+                            maxlength="3" min="0.1" max="1" value="0.1" title="0.1 = 10% / 1 = 100%" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                        <div class="col-xs-4">
+                                <label for="millis_frame">1 frame x ms</label>
+                                <input id="millis_frame" name="millis_frame" type="number" class="form-control form-control-sm"
+                                    maxlength="3" value="100" required>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="bro_quality">Brotli quality</label>
+                                <input id="bro_quality" name="bro_quality" type="number" class="form-control form-control-sm"
+                                    maxlength="1" min="1" max="11" value="4" required>
+                        </div>
+                        
+                        <div class="col-xs-4">
+                                <canvas id="c"></canvas>
+                        </div>
+                </div>
+
+                <div class="form-group row">
+                        <div class="col-xs-12">
+                          <small>
+                              Brotli: github.com/phiresky/rust-brotli-wasm | 
+                              <a href="http://udpx.fasani.de">ESP32 Firmware</a>
+                            </small> 
+                        </div>
+                </div>
+                
+            </form>
+            </div>
+
+        </div>
+        </div>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/brotli-wasm.js"></script>
+        <script src="js/brotli-bootstrap.js"></script>
+        <!-- Integrating this here to test it before Android-->
+        <!-- <script src="js/zlib-bootstrap.js"></script> -->
+        <script type="text/javascript" src="js/chromeapp-canvas.js"></script>
+</body>
+
+</html>

@@ -8,9 +8,11 @@
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
+#include <miniz.c>
+
 #define BROTLI_DECOMPRESSION_BUFFER 3000
 TaskHandle_t brotliTask;
-size_t receivedLength;
+uLong receivedLength;
 TimerHandle_t wifiReconnectTimer;
 unsigned long frameCounter = 0;
 unsigned long frameLastCounter = frameCounter;
@@ -69,6 +71,7 @@ void timerCallback(){
     frameLastCounter = frameCounter;
   } 
 }
+
 // Task sent to the core to decompress + push to Output
 void brTask(void * compressed){  
   
@@ -92,8 +95,8 @@ void brTask(void * compressed){
       int neoMs = micros();
       pix.receive(brOutBuffer, bufferLength);
 
-    if (debugMode) {
-        Serial.printf("Neopixels: %u Brotli: %lu Total: %u us\n", micros()-neoMs, brotliMs, micros()-initMs);
+    if (debugMode) { //Neopixels: %u Brotli: %lu Total: %u us
+        Serial.printf("Neopixels: %lu Brotli: %d Total: %lu us\n", micros()-neoMs, brotliMs, micros()-initMs);
         Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
       }
     } else {
@@ -104,6 +107,7 @@ void brTask(void * compressed){
     delete brOutBuffer;
     vTaskDelete(NULL);
 }
+
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
@@ -130,23 +134,66 @@ void gotIP(system_event_id_t event) {
 
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
-      
-        if ((int) packet.data()[0] == 80) {
-        // Non compressed
-          pix.receive(packet.data(), packet.length());
-		  frameCounter++;
-        } else {
-          receivedLength = packet.length();
-          xTaskCreatePinnedToCore(
+		receivedLength = packet.length();
+		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
+        
+		switch (packet.data()[0]+packet.data()[1])
+		{
+		case 80:
+		{
+			/* Not compressed */
+			pix.receive(packet.data(), packet.length());
+			frameCounter++;
+			break;
+		}
+		case 121:
+		{
+			/* GZIP miniz c file_in file_out */
+		    int initMs = micros();
+			uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
+			uLong uncomp_len;
+			
+			int cmp_status = uncompress(
+				outBuffer, 
+				&uncomp_len, 
+				(const unsigned char*)packet.data(), 
+				packet.length());
+			
+			if (cmp_status == 0) {
+				pix.receive(outBuffer, uncomp_len);
+				frameCounter++;
+				}	
+			if (DEBUG_MODE) {
+				Serial.println("HEX decompression dump");
+				for (size_t i = 0; i<=uncomp_len; i++){
+					Serial.print(outBuffer[i], HEX);
+					Serial.print(" ");
+				}
+
+				// status:
+				// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
+				int uncompressMs = micros()-initMs;
+				Serial.printf
+				("\nStatus:%d Decompressing miniz in %d us. Received: %d bytes, uncomp_length:%lu\n",
+				cmp_status, uncompressMs, packet.length(), uncomp_len);
+			}
+			delete outBuffer;
+		}
+		break;
+		
+		default:
+        {
+			xTaskCreatePinnedToCore(
                     brTask,        
-                    "uncompress", 
+                    "uncompressBR", 
                     10000,         
                     packet.data(),   
                     9,            
                     &brotliTask,  
-                    0);           
-          delay(2);  
-        }
+                    0);
+			break;
+		}
+		}
 
         }); 
  
@@ -173,9 +220,6 @@ void lostCon(system_event_id_t event) {
 	}
 	WiFi.begin(ssidPrim.c_str(), pwPrim.c_str());
 }
-
-// Bluetooth Serial configuration
-#ifdef WIFI_BLE
   /**
  * Create unique device name from MAC address
  **/
@@ -186,7 +230,8 @@ void createName() {
 	// Write unique name into apName
 	sprintf(apName, "udpx-%02X%02X%02X%02X%02X%02X_%d", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5], UDP_PORT);
 }
-
+// Bluetooth Serial configuration
+#ifdef WIFI_BLE
 /**
  * initBTSerial
  * Initialize Bluetooth Serial
@@ -303,6 +348,7 @@ void connectWiFi() {
  * parse data for valid WiFi credentials
  */
 void readBTSerial() {
+	if (!SerialBT.available()) return;
 	uint64_t startTimeOut = millis();
 	String receivedData;
 	int msgSize = 0;
@@ -431,19 +477,17 @@ void setup()
 {
   Serial.begin(115200);
   pix.init();
+
   Serial.printf("UDPX %s\n", UDPX_VERSION); 
+  createName();
 
   #ifdef WIFI_BLE
-  	createName();
-
 	// Start Bluetooth serial
 	initBTSerial();
 	int waitLoop = 0;
 	delay(200);
 	while (waitLoop < BLE_SECONDS_WAIT_FOR_CONFIG) {
-		if (SerialBT.available() != 0) {
-			readBTSerial();		
-  		}
+		readBTSerial();		
 		waitLoop++;
 		delay(1000);
 	}
@@ -474,14 +518,14 @@ void setup()
 	preferences.end();
 
 	if (hasCredentials) {
+		connectWiFi();
 		// Check for available AP's
-		if (!scanWiFi()) {
+		/* if (!scanWiFi()) {
 			Serial.println("Could not find any AP");
-			ESP.restart();
 		} else {
 			// If AP was found, start connection
 			connectWiFi();
-		}
+		} */
 	}
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
@@ -496,8 +540,6 @@ void loop() {
   timer.run();
 
   #ifdef WIFI_BLE
-  if (SerialBT.available() != 0) {
 	readBTSerial();
-  }
   #endif
 }
