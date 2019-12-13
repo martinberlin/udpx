@@ -52,6 +52,13 @@ String ipAddress2String(const IPAddress& ipAddress){
   String(ipAddress[2]) + String(".") +\
   String(ipAddress[3]);
 }
+void showStatus(uint8_t R,uint8_t G,uint8_t B) {
+    pix.write(0, R, G, B);
+    pix.show();
+    delay(1000);
+    pix.write(0, 0, 0, 0);
+    pix.show();
+}
 
 #ifdef WIFI_BLE
   #include <nvs.h>
@@ -131,7 +138,7 @@ void gotIP(system_event_id_t event) {
   if(udp.listen(UDP_PORT)) {
       Serial.println("UDP Listening on: ");
       Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
-
+	  showStatus(0,50,0); // Green
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
@@ -204,6 +211,7 @@ void gotIP(system_event_id_t event) {
 
 /** Callback for connection loss */
 void lostCon(system_event_id_t event) {
+	showStatus(50,0,0); // Red
 	isConnected = false;
 	connStatusChanged = true;
 
@@ -489,10 +497,10 @@ void setup()
 	while (waitLoop < BLE_SECONDS_WAIT_FOR_CONFIG) {
 		readBTSerial();		
 		waitLoop++;
-		delay(1000);
+		showStatus(50,50,0); // Yellow (takes 1 second)
 	}
 	preferences.begin("WiFiCred", false);
-    //preferences.clear();
+    //preferences.clear(); // Uncomment to force delete preferences
 
 	bool hasPref = preferences.getBool("valid", false);
 	if (hasPref) {
