@@ -17,8 +17,7 @@ TimerHandle_t wifiReconnectTimer;
 unsigned long frameCounter = 0;
 unsigned long frameLastCounter = frameCounter;
 unsigned long decompressionFailed = 0;
-// Debug mode prints to serial
-bool debugMode = DEBUG_MODE;
+// DEBUG_MODE is compiled now and cannot be changed on runtime (Check lib/Config)
 // Please follow naming as SERVICE_PORT with an underscore (Android App needs this)
 char apName[] = "udpx-xxxxxxxxxxxx_1234";
 bool usePrimAP = true;
@@ -102,10 +101,11 @@ void brTask(void * compressed){
       int neoMs = micros();
       pix.receive(brOutBuffer, bufferLength);
 
-    if (debugMode) { //Neopixels: %u Brotli: %lu Total: %u us
+    #ifdef DEBUG_MODE
+	 //Neopixels: %u Brotli: %lu Total: %u us
         Serial.printf("Neopixels: %lu Brotli: %d Total: %lu us\n", micros()-neoMs, brotliMs, micros()-initMs);
         Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
-      }
+    #endif
     } else {
       decompressionFailed++;
       Serial.printf("Decompression failed %lu times after frame: %lu\n", decompressionFailed, frameCounter);
@@ -142,8 +142,10 @@ void gotIP(system_event_id_t event) {
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
+		#ifdef DEBUG_MODE
 		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
-        
+        #endif
+
 		switch (packet.data()[0]+packet.data()[1])
 		{
 		case 80:
@@ -155,7 +157,7 @@ void gotIP(system_event_id_t event) {
 		}
 		case 121:
 		{
-			/* GZIP miniz c file_in file_out */
+			/* Zlib: miniz */
 		    int initMs = micros();
 			uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
 			uLong uncomp_len;
@@ -170,7 +172,7 @@ void gotIP(system_event_id_t event) {
 				pix.receive(outBuffer, uncomp_len);
 				frameCounter++;
 				}	
-			if (DEBUG_MODE) {
+			#ifdef DEBUG_MODE
 				Serial.println("HEX decompression dump");
 				for (size_t i = 0; i<=uncomp_len; i++){
 					Serial.print(outBuffer[i], HEX);
@@ -183,11 +185,19 @@ void gotIP(system_event_id_t event) {
 				Serial.printf
 				("\nStatus:%d Decompressing miniz in %d us. Received: %d bytes, uncomp_length:%lu\n",
 				cmp_status, uncompressMs, packet.length(), uncomp_len);
-			}
+			#endif
 			delete outBuffer;
 		}
 		break;
-		
+		case 99: /*  Command: c <4 to make sure is a short command message */
+			if (packet.length()<4) {
+				pix.all_off();
+			}
+		break;
+		case 114: /* Command: r */
+			if (packet.length()<4) {
+				deleteWifiCredentials();
+			}
 		default:
         {
 			xTaskCreatePinnedToCore(
@@ -208,7 +218,13 @@ void gotIP(system_event_id_t event) {
       Serial.println("UDP Lister could not be started");
     }
 }
-
+void deleteWifiCredentials() {
+	Serial.println("Clearing saved WiFi credentials");
+	preferences.begin("WiFiCred", false);
+	preferences.clear();
+	preferences.end();
+	delay(500);
+}
 /** Callback for connection loss */
 void lostCon(system_event_id_t event) {
 	showStatus(50,0,0); // Red
@@ -219,14 +235,14 @@ void lostCon(system_event_id_t event) {
 	lostConnectionCount++;
 	// Avoid trying to connect forever if the user made a typo in password
 	if (lostConnectionCount>4) {
-		Serial.println("Clearing saved WiFi credentials");
-		preferences.begin("WiFiCred", false);
-		preferences.clear();
-		preferences.end();
-		delay(500);
+		deleteWifiCredentials();
 		ESP.restart();
 	}
-	WiFi.begin(ssidPrim.c_str(), pwPrim.c_str());
+	#ifdef WIFI_BLE
+	  WiFi.begin(ssidPrim.c_str(), pwPrim.c_str());
+	#else
+      WiFi.begin(WIFI_SSID, WIFI_PASS);
+	#endif
 }
   /**
  * Create unique device name from MAC address
@@ -538,7 +554,7 @@ void setup()
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
     WiFi.onEvent(lostCon, SYSTEM_EVENT_STA_DISCONNECTED);
-    Serial.println("Connecting to Wi-Fi using WIFI_AP");
+    Serial.printf("Connecting to Wi-Fi using WIFI_AP %s\n", WIFI_SSID);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
   #endif
 
