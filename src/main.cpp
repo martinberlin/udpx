@@ -10,7 +10,7 @@
 #include <Preferences.h>
 #include <miniz.c>
 
-#define BROTLI_DECOMPRESSION_BUFFER 3000
+#define BROTLI_DECOMPRESSION_BUFFER 6000
 TaskHandle_t brotliTask;
 uLong receivedLength;
 TimerHandle_t wifiReconnectTimer;
@@ -64,7 +64,7 @@ void showStatus(uint8_t R,uint8_t G,uint8_t B, int blinkMs) {
   #include <nvs_flash.h>
   #include "BluetoothSerial.h"
 
-    // SerialBT class
+  // SerialBT class
   BluetoothSerial SerialBT;
 
   /** Buffer for JSON string */
@@ -128,7 +128,8 @@ void deleteWifiCredentials() {
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
-	  SerialBT.end();delay(50);
+      SerialBT.disconnect();
+	  SerialBT.end();   
 	#endif
 
   if (isConnected) return;
@@ -186,7 +187,7 @@ void gotIP(system_event_id_t event) {
 				}	
 			#ifdef DEBUG_MODE
 				Serial.println("HEX decompression dump");
-				for (size_t i = 0; i<=uncomp_len; i++){
+				for (size_t i = 0; i<=20; i++){
 					Serial.print(outBuffer[i], HEX);
 					Serial.print(" ");
 				}
@@ -195,8 +196,8 @@ void gotIP(system_event_id_t event) {
 				// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
 				int uncompressMs = micros()-initMs;
 				Serial.printf
-				("\nStatus:%d Decompressing miniz in %d us. Received: %d bytes, uncomp_length:%lu\n",
-				cmp_status, uncompressMs, packet.length(), uncomp_len);
+				("\nStatus:%d Decompressing miniz in %d us. Received: %d bytes, uncomp_length:%lu HEAP:%d\n",
+				cmp_status, uncompressMs, packet.length(), uncomp_len, ESP.getFreeHeap());
 			#endif
 			delete outBuffer;
 		}
@@ -549,14 +550,13 @@ void setup()
 
 	if (hasCredentials) {
 		//TODO: Think if it will be worth to leave 2 APs config, or only 1 in master:
-		//connectWiFi();
-		// Check for available AP's
-	    if (!scanWiFi()) {
+	    connectWiFi();
+		// Check for available AP's. Uncomment if the plan is to use 2 APs and select the best one
+	    /* if (!scanWiFi()) {
 			Serial.println("Could not find any AP");
 		} else {
-			// If AP was found, start connection
 			connectWiFi();
-		}
+		} */
 	}
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
