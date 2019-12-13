@@ -51,10 +51,10 @@ String ipAddress2String(const IPAddress& ipAddress){
   String(ipAddress[2]) + String(".") +\
   String(ipAddress[3]);
 }
-void showStatus(uint8_t R,uint8_t G,uint8_t B) {
+void showStatus(uint8_t R,uint8_t G,uint8_t B, int blinkMs) {
     pix.write(0, R, G, B);
     pix.show();
-    delay(1000);
+    delay(blinkMs);
     pix.write(0, 0, 0, 0);
     pix.show();
 }
@@ -84,21 +84,23 @@ void brTask(void * compressed){
   uint8_t *brOutBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
   size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
   BrotliDecoderResult brotli;
-
-  int initMs = micros();
-
+  #ifdef DEBUG_MODE
+    int initMs = micros();
+  #endif
   brotli = BrotliDecoderDecompress(
     receivedLength,
     (const uint8_t *)compressed,
     &bufferLength,
     brOutBuffer);
-
-  int brotliMs = micros()-initMs;
-  
+	#ifdef DEBUG_MODE
+  	  int brotliMs = micros()-initMs;
+    #endif
     if (brotli) {
       frameCounter++;      
       // Send the decompressed buffer to Pixel lib
-      int neoMs = micros();
+	  #ifdef DEBUG_MODE
+        int neoMs = micros();
+	  #endif
       pix.receive(brOutBuffer, bufferLength);
 
     #ifdef DEBUG_MODE
@@ -146,7 +148,7 @@ void gotIP(system_event_id_t event) {
   if(udp.listen(UDP_PORT)) {
       Serial.println("UDP Listening on: ");
       Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
-	  showStatus(0,50,0); // Green
+	  showStatus(0,50,0,1000); // Green, 1 second
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
@@ -166,7 +168,9 @@ void gotIP(system_event_id_t event) {
 		case 121:
 		{
 			/* Zlib: miniz */
-		    int initMs = micros();
+			#ifdef DEBUG_MODE
+		      int initMs = micros();
+			#endif
 			uint8_t *outBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
 			uLong uncomp_len;
 			
@@ -232,7 +236,7 @@ void gotIP(system_event_id_t event) {
 
 /** Callback for connection loss */
 void lostCon(system_event_id_t event) {
-	showStatus(50,0,0); // Red
+	showStatus(50,0,0,1000); // Red
 	isConnected = false;
 	connStatusChanged = true;
 
@@ -382,6 +386,7 @@ void readBTSerial() {
 	String receivedData;
 	int msgSize = 0;
 	// Read RX buffer into String
+	
 	while (SerialBT.available() != 0) {
 		receivedData += (char)SerialBT.read();
 		msgSize++;
@@ -389,6 +394,7 @@ void readBTSerial() {
 		if ((millis()-startTimeOut) >= 5000) break;
 	}
 	SerialBT.flush();
+	showStatus(0,0,50,200);
 	Serial.println("Received message " + receivedData + " over Bluetooth");
 
 	// Decode the message only if it comes encoded (Like ESP32 WIFI Ble does)
@@ -513,13 +519,7 @@ void setup()
   #ifdef WIFI_BLE
 	// Start Bluetooth serial
 	initBTSerial();
-	int waitLoop = 0;
-	delay(200);
-	while (waitLoop < BLE_SECONDS_WAIT_FOR_CONFIG) {
-		readBTSerial();		
-		waitLoop++;
-		showStatus(50,50,0); // Yellow (takes 1 second)
-	}
+
 	preferences.begin("WiFiCred", false);
     //preferences.clear(); // Uncomment to force delete preferences
 
@@ -543,18 +543,20 @@ void setup()
 		}
 	} else {
 		Serial.println("Could not find preferences, need send data over BLE");
+		showStatus(0,0,100,1000);
 	}
 	preferences.end();
 
 	if (hasCredentials) {
-		connectWiFi();
+		//TODO: Think if it will be worth to leave 2 APs config, or only 1 in master:
+		//connectWiFi();
 		// Check for available AP's
-		/* if (!scanWiFi()) {
+	    if (!scanWiFi()) {
 			Serial.println("Could not find any AP");
 		} else {
 			// If AP was found, start connection
 			connectWiFi();
-		} */
+		}
 	}
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
@@ -569,6 +571,8 @@ void loop() {
   timer.run();
 
   #ifdef WIFI_BLE
-	readBTSerial();
+  if (!WiFi.isConnected()) {
+    readBTSerial();
+  }
   #endif
 }
