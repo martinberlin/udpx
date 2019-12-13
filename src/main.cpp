@@ -115,6 +115,14 @@ void brTask(void * compressed){
     vTaskDelete(NULL);
 }
 
+void deleteWifiCredentials() {
+	Serial.println("Clearing saved WiFi credentials");
+	preferences.begin("WiFiCred", false);
+	preferences.clear();
+	preferences.end();
+	delay(500);
+}
+
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
@@ -150,7 +158,7 @@ void gotIP(system_event_id_t event) {
 		{
 		case 80:
 		{
-			/* Not compressed */
+			/* Pixels: Not compressed */
 			pix.receive(packet.data(), packet.length());
 			frameCounter++;
 			break;
@@ -194,10 +202,13 @@ void gotIP(system_event_id_t event) {
 				pix.all_off();
 			}
 		break;
+		#ifdef WIFI_BLE
 		case 114: /* Command: r */
 			if (packet.length()<4) {
 				deleteWifiCredentials();
 			}
+			break;
+		#endif
 		default:
         {
 			xTaskCreatePinnedToCore(
@@ -218,13 +229,7 @@ void gotIP(system_event_id_t event) {
       Serial.println("UDP Lister could not be started");
     }
 }
-void deleteWifiCredentials() {
-	Serial.println("Clearing saved WiFi credentials");
-	preferences.begin("WiFiCred", false);
-	preferences.clear();
-	preferences.end();
-	delay(500);
-}
+
 /** Callback for connection loss */
 void lostCon(system_event_id_t event) {
 	showStatus(50,0,0); // Red
