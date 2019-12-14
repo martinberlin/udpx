@@ -45,13 +45,9 @@ First Pixel in the Led stripe or matrix will reflect the status
 
 ### udpx Android application steps:
 
-1. Config Tab
-
-![step 1](/examples/udpx_android/screen-1.png)
-
-2. Select your device and accept the pair request
-
-![step 2](/examples/udpx_android/screen-2.png)
+| 1. Config Tab | 2. Select your device and pair |
+| ------------- | -------------------------------|
+| ![step 1](/examples/udpx_android/screen-1.png) | ![step 2](/examples/udpx_android/screen-2.png) |
 
 3. Add your access point credentials and click Send config
 
@@ -67,20 +63,15 @@ First Pixel in the Led stripe or matrix will reflect the status
 
 
 **Credits are due:** All logic doing the Firmware part is from [Bernd Giesecke](https://desire.giesecke.tk), since I followed his great example on ESP32WiFIBLE Android app, to make this configurable per Bluetooth serial. I implemented in a way that both [udpx Android](https://play.google.com/store/apps/details?id=io.cordova.udpx) and [ESP32 WiFi BLE](https://play.google.com/store/apps/details?id=tk.giesecke.esp32wifible) as a WiFi configuration mean are supported. 
-Bernd implementation in Java can configure up to 2 APs in the ESP32 and in the Firmware side measures the WiFi.RSSI of each AP in case both are matched, and connecting to the one that has better signal. 
 
 ### udpx Chrome App
 
-In case you want to send test examples from a desktop computer try out our Chrome app in this branch.
-
-To install the Chrome App:
+In case you want to send test examples from a desktop computer try out our Chrome app in this branch. To install the it:
 
 1. chrome://extensions -> Enable developer mode
 2. Load unpacked extension and point to examples/chromeapp directory
 3. That's it, you can open it on:
     chrome://apps
-
-### udpx
 
 ### TEAM
 
@@ -96,11 +87,7 @@ UDPX is a collaborative effort where a team of 3 have same access level to the r
 
 **Pixels** is a binary transport protocol. A way to send bytes to an ESP32 that are after arrival decoded and send to a RGB / RGBw Led strip. 
  
-**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the udpx project that both is small as possible, and made for real-time applications, which has the ability to be compressed. And it also overcomes the maximum transport size limit of the ESP32 on Arduino framework, since you cannot receive an UDP bigger than 1470 bytes.
-S is being currently tested and implemented in the **testing/s** branch of this repository.
-
-Both where developed by Samuel and are used by UDPX.
-
+**S or "Little Stream"** is an an embedded streaming library for embedded devices. Is simple data transport layer that is meant to be used in the udpx project that both is small as possible, and made for real-time applications, which has the ability to be compressed. Both protocols where developed by Samuel and are used by UDPX.
 
 ## Branches
 
@@ -114,19 +101,6 @@ DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
 **feature/tcp** A TCP experiment since Martin had to do something for a client that wanted to use HTTP, interesting to see how fast is UDP compared to TCP, just left there for research reasons.
 
 **feature/json-v0.1** Only stored for historical reasons, it our first JSON + Brotli compressed protocol, that was tested and even though the limitations [proved to be quite fast](https://twitter.com/martinfasani/status/1166106095858966529).
-
-
-## Test after compiling
-
-Main test if you don't want to use the Android app that should pass before merging in develop: 
-
-examples/test
-
-    Open it in your browser
-    nodejs middleware.js 
-    Send UDP packets to the ESP32 IP in both RGB / RGBW to certify it works, does not crash and fullfills expected behaviour.
-
-Please DO NOT merge in any stable branch before the tests pass.
 
 ## Branching model
 
