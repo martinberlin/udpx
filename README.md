@@ -37,6 +37,12 @@ Serial output:
 
 If a fast start without wait is desired the best would be to add a hardware button, that only when pressed will wait for configuration.
 
+First Pixel in the Led stripe or matrix will reflect the status
+
+1. BLUE     Waiting for Bluetooth config 
+2. GREEN    Connected successfully, got IP
+3. RED      Connection failed, will turn to 1.Waiting for config after 4 fails
+
 ### udpx Android application steps:
 
 1. Config Tab
@@ -63,6 +69,18 @@ If a fast start without wait is desired the best would be to add a hardware butt
 **Credits are due:** All logic doing the Firmware part is from [Bernd Giesecke](https://desire.giesecke.tk), since I followed his great example on ESP32WiFIBLE Android app, to make this configurable per Bluetooth serial. I implemented in a way that both [udpx Android](https://play.google.com/store/apps/details?id=io.cordova.udpx) and [ESP32 WiFi BLE](https://play.google.com/store/apps/details?id=tk.giesecke.esp32wifible) as a WiFi configuration mean are supported. 
 Bernd implementation in Java can configure up to 2 APs in the ESP32 and in the Firmware side measures the WiFi.RSSI of each AP in case both are matched, and connecting to the one that has better signal. 
 
+### udpx Chrome App
+
+In case you want to send test examples from a desktop computer try out our Chrome app in this branch.
+
+To install the Chrome App:
+
+1. chrome://extensions -> Enable developer mode
+2. Load unpacked extension and point to examples/chromeapp directory
+3. That's it, you can open it on:
+    chrome://apps
+
+### udpx
 
 ### TEAM
 
