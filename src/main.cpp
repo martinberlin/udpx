@@ -237,17 +237,18 @@ void gotIP(system_event_id_t event) {
 
 /** Callback for connection loss */
 void lostCon(system_event_id_t event) {
-	showStatus(50,0,0,1000); // Red
 	isConnected = false;
 	connStatusChanged = true;
 
     Serial.printf("WiFi lost connection try %d to connect again\n", lostConnectionCount);
-	lostConnectionCount++;
 	// Avoid trying to connect forever if the user made a typo in password
 	if (lostConnectionCount>4) {
 		deleteWifiCredentials();
 		ESP.restart();
+	} else if (lostConnectionCount>1) {
+		showStatus(50,0,0,1000); // Red
 	}
+	lostConnectionCount++;
 	#ifdef WIFI_BLE
 	  WiFi.begin(ssidPrim.c_str(), pwPrim.c_str());
 	#else
