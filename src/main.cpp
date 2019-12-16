@@ -38,6 +38,7 @@ AsyncUDP udp;
 SimpleTimer timer;
 // Output class pixels
 PIXELS pix;
+uint8_t timerEachSec = 2;
 
 typedef struct {
   unsigned size;
@@ -73,7 +74,7 @@ void showStatus(uint8_t R,uint8_t G,uint8_t B, int blinkMs) {
 
 void timerCallback(){
   if (frameLastCounter != frameCounter) {
-    Serial.printf("FPS: %lu Frames received: %lu\n", frameCounter-frameLastCounter, frameCounter);
+    Serial.printf("FPS: %lu Frames received: %lu\n", (frameCounter-frameLastCounter)/timerEachSec, frameCounter);
     frameLastCounter = frameCounter;
   } 
 }
@@ -134,7 +135,7 @@ void gotIP(system_event_id_t event) {
 
   if (isConnected) return;
 	// Interval to measure FPS  (millis, function called, times invoked for 1000ms around 1 hr and half)
-	timer.setTimer(1000, timerCallback, 6000);
+	timer.setTimer(timerEachSec*1000, timerCallback, 6000);
 
   	isConnected = true;
 	connStatusChanged = true;
