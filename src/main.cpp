@@ -74,7 +74,7 @@ void showStatus(uint8_t R,uint8_t G,uint8_t B, int blinkMs) {
 
 void timerCallback(){
   if (frameLastCounter != frameCounter) {
-    Serial.printf("FPS: %lu Frames received: %lu\n", (frameCounter-frameLastCounter)/timerEachSec, frameCounter);
+    Serial.printf("FPS %lu / %lu\n", (frameCounter-frameLastCounter)/timerEachSec, frameCounter);
     frameLastCounter = frameCounter;
   } 
 }
