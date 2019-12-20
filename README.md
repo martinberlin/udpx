@@ -94,9 +94,6 @@ UDPX is a collaborative effort where a team of 3 have same access level to the r
 
 **main** Supports Brotli compression when the first byte is not 'p' (80), is the only branch that has BTSerial configuration
 
-**develop** Main branch only with Pixels protocol. 
-DEMO: https://www.youtube.com/watch?v=6ybJ6rIGSAo
-
 **testing/testing-s** Implementing here the Pixels+S Protocol (Aka "Little stream" https://github.com/IoTPanic/s)
 
 **feature/tcp** A TCP experiment since Martin had to do something for a client that wanted to use HTTP, interesting to see how fast is UDP compared to TCP, just left there for research reasons.
@@ -115,7 +112,7 @@ Please adhere to following branching model when working in this repository. Not 
     bug/1     → Merged back in develop
     
 
-    Please except of PIXELS+s no stale branches unless there is a real need to have them. 
+    Please except of the existing feature branches do not leave stale branches unless there is a real need to have them. Branches that diverge from master/develop and are stale for weeks will be deleted.
 
 Testing should pass when examples/test is open in the browser and two different ESP32 with RGB /RGBW stripe outputs match the expected results.
 
@@ -123,17 +120,15 @@ Testing should pass when examples/test is open in the browser and two different 
 
     /lib/Config/Config.h
 
-Mandatory:
+Mandatory only if you don't use WIFI_BLE configuration:
 WIFI_SSID / WIFI_PASS 
-
-only if WIFI_BLE is not defined. If it is, then WiFi credentials are received per Bluetooth
 
 UDP_PORT defaults to 1234
 
 
     .pio/libdeps/BOARD/PIXELS/src/pixels.h
 
-The number of leds in the stripe: 
+The number of leds in the stripe, note that if you sent more than PIXELCOUNT it will simply not render it: 
 
 #define PIXELCOUNT 72
 
@@ -150,7 +145,7 @@ using RGB:
     //#define RGBW 
     // It defaults to this. We are using R,G,B on our led matrix part of the firmware since with White needs 4 bytes per pixel
 
-**Note:** Using a RGB / RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp)
+**Note:** Switching between RGB to RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp) Please refer to the Neopixels wiki on the right way to do this correctly for your Led stripe.
 
 ### History
 
@@ -168,23 +163,13 @@ using RGB:
 
 **2019-06** Started working with Front-end developer [Hendrik Putzek](https://twitter.com/hputzek) to develop a firmware solution to transport a lot of frames per seconds from his Nodejs backend to a Led controller
 
-#### Old command line test
-
-Use it only to check that compilation went right. For real tests please use Android or Chrome App
-
-Command line test:
-
-    cat examples/send-test-files/72-on.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
-
-Should turn on some Leds provided netcat is installed on your system.
-
-    cat examples/send-test-files/72-of.json.br |nc -w1 -u ESP32_IP_ADDRESS 1234
-
-Should turn off all leds in the 72 addressable led stripe. 
-
 ### License
 
 This repository is licensed with a ["CC Attribution-NonCommercial"](https://creativecommons.org/licenses/by-nc/4.0/legalcode) License.
 
 It contains code and examples that can be used and copied freely for artistic works and it can be also used for commercial projects provided you write as a line to explain how is going to be used and our license and credits are maintained.
 We put really a lot of time and effort building this Firmware and we would like to give proffesional support to integrate it in the future.
+
+### Companion Firmware
+
+[Remora](https://github.com/martinberlin/Remora) Listens short UDP commands and triggers fast animations in ESP32/ESP8266. It supports udpx protocol (non compressed). So it can receive and render up to 484 RGB pixels as an animation frame.
