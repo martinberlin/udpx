@@ -17,9 +17,9 @@ TimerHandle_t wifiReconnectTimer;
 unsigned long frameCounter = 0;
 unsigned long frameLastCounter = frameCounter;
 unsigned long decompressionFailed = 0;
+unsigned long frameTimerCalls = 0;
 // DEBUG_MODE is compiled now and cannot be changed on runtime (Check lib/Config)
-// Please follow naming as SERVICE_PORT with an underscore (Android App needs this)
-char apName[] = "udpx-xxxxxxxxxxxx_1234";
+char apName[] = "udpx-xxxxxxxxxxxx_1234"; // Please follow naming as SERVICE_PORT with an underscore
 bool usePrimAP = true;
 /** Flag if stored AP credentials are available */
 bool hasCredentials = false;
@@ -74,7 +74,9 @@ void showStatus(uint8_t R,uint8_t G,uint8_t B, int blinkMs) {
 
 void timerCallback(){
   if (frameLastCounter != frameCounter) {
-    Serial.printf("FPS %lu / %lu\n", (frameCounter-frameLastCounter)/timerEachSec, frameCounter);
+    frameTimerCalls++;
+    Serial.printf("FPS %lu / %lu / AVG %lu\n", (frameCounter-frameLastCounter)/timerEachSec, 
+	frameCounter, frameCounter/(frameTimerCalls*timerEachSec));
     frameLastCounter = frameCounter;
   } 
 }
