@@ -147,6 +147,11 @@ using RGB:
 
 **Note:** Switching between RGB to RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp) Please refer to the Neopixels wiki on the right way to do this correctly for your Led stripe.
 
+### Hardware
+
+This Firmware can work to stream pixel frame-per-frame animations to any Led stripe supported by the underlying library Neopixels. Any type of addresable LEDs should work if you select the right implementation in .libdeps/PIXELS
+Please make sure to check our [Hardware buying guide](https://github.com/martinberlin/udpx/wiki/Hardware-buying-guide) if your are planning to stream video. Check the [Neopixels documentation](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) to select the right implementation to your LED Stripe.
+
 ### History
 
 **2019-12** Martin converted his Chrome example into an Android cordova hibryd application. It features WiFi configuration, multicast DNS discovery and picture/video streaming
