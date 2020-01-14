@@ -10,7 +10,7 @@
 #include <Preferences.h>
 #include <miniz.c>
 
-#define BROTLI_DECOMPRESSION_BUFFER 6000
+#define BROTLI_DECOMPRESSION_BUFFER 4000
 TaskHandle_t brotliTask;
 uLong receivedLength;
 TimerHandle_t wifiReconnectTimer;
@@ -153,22 +153,22 @@ void gotIP(system_event_id_t event) {
       Serial.println("UDP Listening on: ");
       Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
 	  showStatus(0,50,0,1000); // Green, 1 second
+
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
 		#ifdef DEBUG_MODE
-		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
+		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes HEAP: %d\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength,ESP.getFreeHeap());
         #endif
+		/* Pixels: Not compressed */
+		/* if (packet.data()[0] = 80) {
+			pix.receive(packet.data(), packet.length());
+			frameCounter++;
+			return;
+		} */
 
 		switch (packet.data()[0]+packet.data()[1])
 		{
-		case 80:
-		{
-			/* Pixels: Not compressed */
-			pix.receive(packet.data(), packet.length());
-			frameCounter++;
-			break;
-		}
 		case 121:
 		{
 			/* Zlib: miniz */
@@ -189,12 +189,12 @@ void gotIP(system_event_id_t event) {
 				frameCounter++;
 				}	
 			#ifdef DEBUG_MODE
-				Serial.println("HEX decompression dump");
+				/* Serial.println("HEX decompression dump");
 				for (size_t i = 0; i<=20; i++){
 					Serial.print(outBuffer[i], HEX);
 					Serial.print(" ");
 				}
-
+ 				*/
 				// status:
 				// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
 				int uncompressMs = micros()-initMs;
@@ -522,8 +522,6 @@ void setup()
   createName();
 
   #ifdef WIFI_BLE
-	// Start Bluetooth serial
-	initBTSerial();
 
 	preferences.begin("WiFiCred", false);
     //preferences.clear(); // Uncomment to force delete preferences
@@ -561,6 +559,9 @@ void setup()
 		} else {
 			connectWiFi();
 		} */
+	} else {
+		// Start Bluetooth serial
+		initBTSerial();
 	}
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
