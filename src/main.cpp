@@ -162,13 +162,19 @@ void gotIP(system_event_id_t event) {
         #endif
 		/* Pixels: Not compressed */
 		/* if (packet.data()[0] = 80) {
-			pix.receive(packet.data(), packet.length());
-			frameCounter++;
+			
 			return;
 		} */
 
 		switch (packet.data()[0]+packet.data()[1])
 		{
+		case 80:
+		{
+			/* Pixels: Not compressed */
+			pix.receive(packet.data(), packet.length());
+			frameCounter++;
+			break;
+		}
 		case 121:
 		{
 			/* Zlib: miniz */
