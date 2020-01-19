@@ -17,9 +17,6 @@ If you want to test this using Android just download and install the udpx app fr
 
 The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open source. Feel free to explore and learn Cordova to make hybrid apps.
 
-**Little stream protocol tester and nodejs libraries**
-https://github.com/hputzek/little-stream-protocol This will let you experience much better Framerate and it also supports S as a protocol with compression.
-
 ### Configuring WiFi using Bluetooth
 
 Starting with version 1.1 defined in lib/Config.h the firmware supports receiving configuration over Bluetooth Serial. It waits BLE_SECONDS_WAIT_FOR_CONFIG on every start. If you want to make the start faster just set this to a low number.
