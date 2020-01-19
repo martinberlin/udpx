@@ -54,7 +54,6 @@ d.addEventListener('DOMContentLoaded', function(){
         cleanTransmission();
     };
     m_invert_unit.onchange = function() {
-        saveFormState();
        if (m_invert_unit.checked) {
          adv_invert = -1;
         } else {
