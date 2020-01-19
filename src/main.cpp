@@ -131,7 +131,7 @@ void deleteWifiCredentials() {
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
-      SerialBT.disconnect();
+      //SerialBT.disconnect(); // In some configurations does not find this method
 	  SerialBT.end();   
 	#endif
 
