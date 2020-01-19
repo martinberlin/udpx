@@ -10,16 +10,16 @@
 #include <Preferences.h>
 #include <miniz.c>
 
-#define BROTLI_DECOMPRESSION_BUFFER 6000
+#define BROTLI_DECOMPRESSION_BUFFER 4000
 TaskHandle_t brotliTask;
 uLong receivedLength;
 TimerHandle_t wifiReconnectTimer;
 unsigned long frameCounter = 0;
 unsigned long frameLastCounter = frameCounter;
 unsigned long decompressionFailed = 0;
+unsigned long frameTimerCalls = 0;
 // DEBUG_MODE is compiled now and cannot be changed on runtime (Check lib/Config)
-// Please follow naming as SERVICE_PORT with an underscore (Android App needs this)
-char apName[] = "udpx-xxxxxxxxxxxx_1234";
+char apName[] = "udpx-xxxxxxxxxxxx_1234"; // Please follow naming as SERVICE_PORT with an underscore
 bool usePrimAP = true;
 /** Flag if stored AP credentials are available */
 bool hasCredentials = false;
@@ -74,7 +74,9 @@ void showStatus(uint8_t R,uint8_t G,uint8_t B, int blinkMs) {
 
 void timerCallback(){
   if (frameLastCounter != frameCounter) {
-    Serial.printf("FPS %lu / %lu\n", (frameCounter-frameLastCounter)/timerEachSec, frameCounter);
+    frameTimerCalls++;
+    Serial.printf("FPS %lu / %lu / AVG %lu\n", (frameCounter-frameLastCounter)/timerEachSec, 
+	frameCounter, frameCounter/(frameTimerCalls*timerEachSec));
     frameLastCounter = frameCounter;
   } 
 }
@@ -129,7 +131,7 @@ void deleteWifiCredentials() {
 /** Callback for receiving IP address from AP */
 void gotIP(system_event_id_t event) {
 	#ifdef WIFI_BLE
-      SerialBT.disconnect();
+      //SerialBT.disconnect(); // In some configurations does not find this method
 	  SerialBT.end();   
 	#endif
 
@@ -151,12 +153,18 @@ void gotIP(system_event_id_t event) {
       Serial.println("UDP Listening on: ");
       Serial.print(WiFi.localIP());Serial.println(":"+String(UDP_PORT)); 
 	  showStatus(0,50,0,1000); // Green, 1 second
+
     // Executes on UDP receive
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
 		#ifdef DEBUG_MODE
-		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
+		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes HEAP: %d\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength,ESP.getFreeHeap());
         #endif
+		/* Pixels: Not compressed */
+		/* if (packet.data()[0] = 80) {
+			
+			return;
+		} */
 
 		switch (packet.data()[0]+packet.data()[1])
 		{
@@ -187,12 +195,12 @@ void gotIP(system_event_id_t event) {
 				frameCounter++;
 				}	
 			#ifdef DEBUG_MODE
-				Serial.println("HEX decompression dump");
+				/* Serial.println("HEX decompression dump");
 				for (size_t i = 0; i<=20; i++){
 					Serial.print(outBuffer[i], HEX);
 					Serial.print(" ");
 				}
-
+ 				*/
 				// status:
 				// { MZ_OK = 0, MZ_STREAM_END = 1, MZ_NEED_DICT = 2, MZ_ERRNO = -1, MZ_STREAM_ERROR = -2, MZ_DATA_ERROR = -3, MZ_MEM_ERROR = -4, MZ_BUF_ERROR = -5, MZ_VERSION_ERROR = -6, MZ_PARAM_ERROR = -10000 };
 				int uncompressMs = micros()-initMs;
@@ -520,8 +528,6 @@ void setup()
   createName();
 
   #ifdef WIFI_BLE
-	// Start Bluetooth serial
-	initBTSerial();
 
 	preferences.begin("WiFiCred", false);
     //preferences.clear(); // Uncomment to force delete preferences
@@ -559,6 +565,9 @@ void setup()
 		} else {
 			connectWiFi();
 		} */
+	} else {
+		// Start Bluetooth serial
+		initBTSerial();
 	}
 	#else
 	WiFi.onEvent(gotIP, SYSTEM_EVENT_STA_GOT_IP);
