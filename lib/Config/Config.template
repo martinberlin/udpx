@@ -6,10 +6,6 @@
 // Enable WIFI_BLE to receive WiFi config over bluetooth
 #define WIFI_BLE
 
-// How long will wait in SECONDS when WIFI_BLE is defined in setup()
-// Set to 0 if you want a fast startup (But no option to set credentials once connected at this point)
-#define BLE_SECONDS_WAIT_FOR_CONFIG 9
-
 // Comment out WIFI_BLE to use a fixed SSID /PASS and define it:
 #define WIFI_SSID "KabelBox-A210"
 #define WIFI_PASS ""

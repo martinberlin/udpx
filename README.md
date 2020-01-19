@@ -19,11 +19,11 @@ The [udpx Android App](https://github.com/martinberlin/udpx-app) is also open so
 
 ### Configuring WiFi using Bluetooth
 
-Starting with version 1.1 defined in lib/Config.h the firmware supports receiving configuration over Bluetooth Serial. It waits BLE_SECONDS_WAIT_FOR_CONFIG on every start. If you want to make the start faster just set this to a low number.
+Starting with version 1.1 defined in lib/Config.h the firmware supports receiving configuration over Bluetooth Serial.
 
 1.- Firmware boots, opens Bluetooth serial and waits for 9 seconds as default. Serial output:  
 
-    UDPX 1.1
+    UDPX 1.x
     BTSerial active. Device name: udpx-3C71BF9D53DC_1234
 
 2.- If in this time receives configuration it updates the SSID / Password and stores it on Preferences
@@ -69,6 +69,8 @@ In case you want to send test examples from a desktop computer try out our Chrom
 2. Load unpacked extension and point to examples/chromeapp directory
 3. That's it, you can open it on:
     chrome://apps
+
+Please note that this app will be discontinued and not supported anymore starting on February 2020 since the preferred way to test this is the Android app. Zlib is not supported on Chrome App and it's very hard to port, so we will leave the existing code just as a proof-of-concept on how to send UDP packets to udpx.
 
 ### TEAM
 
