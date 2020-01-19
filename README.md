@@ -11,9 +11,7 @@
 ### How to test this
 
 **Android App latest builds**
-If you want to test this fast using Android, just download and install the udpx app from Play store: 
-
-<a href="https://play.google.com/store/apps/details?id=io.cordova.udpx" />
+If you want to test this using Android just download and install the udpx app from Play store: <a href="https://play.google.com/store/apps/details?id=io.cordova.udpx" />
 <img src="/examples/udpx-app-180x120.jpg" />
 [udpx esp32](https://play.google.com/store/apps/details?id=io.cordova.udpx)
 
