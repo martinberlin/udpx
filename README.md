@@ -133,13 +133,17 @@ UDP_PORT defaults to 1234
 
     .pio/libdeps/BOARD/PIXELS/src/pixels.h
 
-The number of leds in the stripe, note that if you sent more than PIXELCOUNT it will simply not render it: 
+The number of leds in the stripe or Led matrix, note that if you sent more than PIXELCOUNT it will simply not render it: 
 
-#define PIXELCOUNT 72
+#define PIXELCOUNT 1000
 
-The data pin of the addressable leds:
+The data pin(s) of the addressable leds:
 
-#define PIXELPIN 19
+const char pixelpin[] = { 19, 18 };
+
+// Uncomment if we sent per chunks in different channels
+#define PIXELCHUNK 500 
+If this is set, then there are 2 header bytes (16 bit unsigned) that will signalize it too, and then first 500 pixels will go to pixelpin[0] and the rest will go to pixelpin[1]. Note that this is experimental and at the moment is only working for two chunks.
 
 Uncommenting this line will enable RGBW mode sending 4 bytes per pixel. It should be commented if you use RGB:
 
@@ -151,6 +155,10 @@ using RGB:
     // It defaults to this. We are using R,G,B on our led matrix part of the firmware since with White needs 4 bytes per pixel
 
 **Note:** Switching between RGB to RGBW enforces you to update that line but also the [Neopixel class features](https://github.com/Makuna/NeoPixelBus/wiki/NeoPixelBus-object#neo-features) depending on the addressable leds you use (/lib/src/pixels/src/pixels.cpp) Please refer to the Neopixels wiki on the right way to do this correctly for your Led stripe.
+
+### Limitations
+
+This Firmware is limited by the MTU of the ESP32 that is 1470 bytes. If it receives a payload bigger than that the udp.onPacket callback will never take place. So in our experience we can send maximum about 1000 RGB pixels using PIX565 Zlib at a decent framerate.
 
 ### Hardware
 
