@@ -3,7 +3,6 @@
 #include <AsyncUDP.h>
 #include <Config.h>
 #include <pixels.h>
-#include <brotli/decode.h>
 #include <SimpleTimer.h>
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
@@ -81,45 +80,6 @@ void timerCallback(){
   } 
 }
 
-// Task sent to the core to decompress + push to Output
-void brTask(void * compressed){  
-  
-  uint8_t *brOutBuffer = new uint8_t[BROTLI_DECOMPRESSION_BUFFER];
-  size_t bufferLength = BROTLI_DECOMPRESSION_BUFFER;
-  BrotliDecoderResult brotli;
-  #ifdef DEBUG_MODE
-    int initMs = micros();
-  #endif
-  brotli = BrotliDecoderDecompress(
-    receivedLength,
-    (const uint8_t *)compressed,
-    &bufferLength,
-    brOutBuffer);
-	#ifdef DEBUG_MODE
-  	  int brotliMs = micros()-initMs;
-    #endif
-    if (brotli) {
-      frameCounter++;      
-      // Send the decompressed buffer to Pixel lib
-	  #ifdef DEBUG_MODE
-        int neoMs = micros();
-	  #endif
-      pix.receive(brOutBuffer, bufferLength);
-
-    #ifdef DEBUG_MODE
-	 //Neopixels: %u Brotli: %lu Total: %u us
-        Serial.printf("Neopixels: %lu Brotli: %d Total: %lu us\n", micros()-neoMs, brotliMs, micros()-initMs);
-        Serial.printf("Decompressed %u bytes for frame %lu Heap %u\n", bufferLength, frameCounter, ESP.getFreeHeap());
-    #endif
-    } else {
-      decompressionFailed++;
-      Serial.printf("Decompression failed %lu times after frame: %lu\n", decompressionFailed, frameCounter);
-    }
-    
-    delete brOutBuffer;
-    vTaskDelete(NULL);
-}
-
 void deleteWifiCredentials() {
 	Serial.println("Clearing saved WiFi credentials");
 	preferences.begin("WiFiCred", false);
@@ -162,13 +122,6 @@ void gotIP(system_event_id_t event) {
 
 		switch (packet.data()[0]+packet.data()[1])
 		{
-		case 80:
-		{
-			/* Pixels: Not compressed */
-			pix.receive(packet.data(), packet.length());
-			frameCounter++;
-			break;
-		}
 		case 121:
 		{
 			/* Zlib: miniz */
@@ -219,14 +172,9 @@ void gotIP(system_event_id_t event) {
 		#endif
 		default:
         {
-			xTaskCreatePinnedToCore(
-                    brTask,        
-                    "uncompressBR", 
-                    10000,         
-                    packet.data(),   
-                    9,            
-                    &brotliTask,  
-                    0);
+			/* Pixels: Not compressed */
+			pix.receive(packet.data(), packet.length());
+			frameCounter++;
 			break;
 		}
 		}
