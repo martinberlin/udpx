@@ -1,6 +1,6 @@
 // Configuration
 #define DEBUG_MODE true
-#define UDPX_VERSION "1.2"
+#define UDPX_VERSION "1.3 Led master edition"
 
 // Only one of this two options should be enabled, either WIFI_BLE or WIFI_AP (But not at the same time please)
 // Enable WIFI_BLE to receive WiFi config over bluetooth

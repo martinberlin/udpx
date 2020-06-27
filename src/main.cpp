@@ -117,12 +117,13 @@ void gotIP(system_event_id_t event) {
     udp.onPacket([](AsyncUDPPacket packet) {
 		receivedLength = packet.length();
 		#ifdef DEBUG_MODE
-		Serial.printf("First BYTE:%d b[0]+b[1]:%d of %lu bytes\n", packet.data()[0],packet.data()[0]+packet.data()[1], receivedLength);
+		Serial.printf("1:%x 2:%x total:%d of %lu bytes\n", packet.data()[0],packet.data()[1],packet.data()[0]+packet.data()[1], receivedLength);
         #endif
 
 		switch (packet.data()[0]+packet.data()[1])
 		{
-		case 121:
+		case 121  : /* Android */
+		case 276  : /* LED Master */
 		{
 			/* Zlib: miniz */
 			#ifdef DEBUG_MODE
